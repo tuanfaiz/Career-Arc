@@ -6,8 +6,16 @@ import { Wand2, ExternalLink, Plus, Award, X } from 'lucide-react'
 
 const entryColors = ['#ff4757', '#6c5ce7', '#00b894', '#0984e3']
 
+type PortfolioItem = {
+  id: string; year: string; title: string; type: string
+  description: string; descriptionPolished: string; professionalDesc: string
+  tags: string[]; link: string | null; github: string | null; color: string
+  showingProfessional: boolean; polishing: boolean
+  teamSize?: number; company?: string; client?: string; award?: string
+}
+
 export default function PortfolioPage() {
-  const [items, setItems] = useState(mockPortfolioEntries.map((item, i) => ({
+  const [items, setItems] = useState<PortfolioItem[]>(mockPortfolioEntries.map((item, i) => ({
     ...item,
     color: entryColors[i % entryColors.length],
     link: item.github,
@@ -71,8 +79,7 @@ export default function PortfolioPage() {
                     tags: newItem.tags.split(',').map(t => t.trim()).filter(Boolean),
                     link: null, github: null, color: colors[Math.floor(Math.random() * colors.length)],
                     showingProfessional: false, polishing: false, teamSize: 1,
-                    company: undefined, client: undefined, award: undefined,
-                  } as typeof prev[0]])
+                  }])
                   setNewItem({ year: '', title: '', type: '', description: '', tags: '' })
                   setShowAddForm(false)
                 }
