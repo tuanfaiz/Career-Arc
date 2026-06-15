@@ -71,7 +71,8 @@ export default function PortfolioPage() {
                     tags: newItem.tags.split(',').map(t => t.trim()).filter(Boolean),
                     link: null, github: null, color: colors[Math.floor(Math.random() * colors.length)],
                     showingProfessional: false, polishing: false, teamSize: 1,
-                  }])
+                    company: undefined, client: undefined, award: undefined,
+                  } as typeof prev[0]])
                   setNewItem({ year: '', title: '', type: '', description: '', tags: '' })
                   setShowAddForm(false)
                 }
