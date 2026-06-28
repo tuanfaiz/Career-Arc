@@ -1,14 +1,26 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { mockJobs } from '@/lib/mockData'
-import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ExternalLink } from 'lucide-react'
+import { mockJobs, mockCompanies } from '@/lib/mockData'
+import { defaultProfile } from '@/lib/careerData'
+import { compatibility } from '@/lib/scoring'
+import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ArrowRight, BadgeCheck } from 'lucide-react'
+
+const companyByName: Record<string, { id: string; verified: boolean }> =
+  Object.fromEntries(mockCompanies.map(c => [c.name, { id: c.id, verified: c.verified }]))
 
 export default function JobsPage() {
   const [query, setQuery] = useState('')
   const [filterExp, setFilterExp] = useState('All')
   const [filterGhost, setFilterGhost] = useState('All')
   const [saved, setSaved] = useState<string[]>([])
+  const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    try { const raw = localStorage.getItem('careerProfile'); if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills) } } catch { /* defaults */ }
+  }, [])
 
   const expOptions = ['All', 'Junior (0–2 yrs)', 'Mid (2–5 yrs)']
   const ghostOptions = ['All', 'Active', 'Passive', 'Risk']
@@ -76,7 +88,11 @@ export default function JobsPage() {
           <div className="text-center py-16 text-[#4a5568] font-mono">No jobs matched your filters.</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
-            {filtered.map(job => (
+            {[...filtered].sort((a, b) => compatibility(skills, b.skills).score - compatibility(skills, a.skills).score).map(job => {
+              const comp = compatibility(skills, job.skills)
+              const cColor = comp.score >= 85 ? '#00b894' : comp.score >= 60 ? '#b9831f' : '#ff4757'
+              const cBg = comp.score >= 85 ? '#00b89418' : comp.score >= 60 ? '#fdcb6e33' : '#ff475718'
+              return (
               <div key={job.id} className="card-hover rounded-2xl p-6 relative" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
                 <div className="flex items-start gap-4 mb-4">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold font-mono text-sm flex-shrink-0" style={{ background: job.logoColor, boxShadow: '3px 3px 6px rgba(0,0,0,0.15)' }}>
@@ -84,10 +100,18 @@ export default function JobsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-[#2d3436] truncate">{job.title}</h3>
-                    <div className="text-sm text-[#4a5568]">{job.company}</div>
+                    {companyByName[job.company] ? (
+                      <Link href={`/companies/${companyByName[job.company].id}`}
+                        className="text-sm inline-flex items-center gap-1 hover:underline" style={{ color: '#4a5568' }}>
+                        {job.company}
+                        {companyByName[job.company].verified && <BadgeCheck className="w-3.5 h-3.5" style={{ color: '#8A6D1F' }} />}
+                      </Link>
+                    ) : (
+                      <div className="text-sm text-[#4a5568]">{job.company}</div>
+                    )}
                   </div>
-                  <div className="px-3 py-1.5 rounded-xl text-sm font-mono font-bold flex-shrink-0" style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757' }}>
-                    {job.matchPercent}% Match
+                  <div className="px-3 py-1.5 rounded-xl text-sm font-mono font-bold flex-shrink-0" style={{ background: cBg, color: cColor }}>
+                    {comp.score}% Match
                   </div>
                 </div>
 
@@ -98,11 +122,17 @@ export default function JobsPage() {
                   {job.remote && <span className="px-2 py-0.5 rounded-md font-bold" style={{ background: 'rgba(9,132,227,0.1)', color: '#0984e3' }}>Remote OK</span>}
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mb-4">
-                  {job.skills.map(s => (
-                    <span key={s} className="px-2 py-0.5 rounded-md text-xs font-mono text-[#4a5568]" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>{s}</span>
-                  ))}
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {job.skills.map(s => {
+                    const missing = comp.missing.includes(s)
+                    return (
+                      <span key={s} className="px-2 py-0.5 rounded-md text-xs font-mono" style={{ background: '#e0e5ec', color: missing ? '#ff4757' : '#4a5568', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>{s}</span>
+                    )
+                  })}
                 </div>
+                {comp.missing.length > 0 && (
+                  <p className="text-xs mb-4" style={{ color: '#4a5568' }}>You&apos;re missing <span className="font-bold" style={{ color: '#ff4757' }}>{comp.missing.length}</span> skill{comp.missing.length > 1 ? 's' : ''} for this role</p>
+                )}
 
                 <div className="flex items-center gap-2 mb-5 p-3 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
                   <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{
@@ -114,9 +144,9 @@ export default function JobsPage() {
                 </div>
 
                 <div className="flex gap-3">
-                  <button className="flex-1 py-2.5 bg-accent text-white text-sm font-bold rounded-xl btn-press uppercase tracking-wider flex items-center justify-center gap-2" style={{ boxShadow: '4px 4px 8px rgba(166,50,60,0.3)' }}>
-                    <ExternalLink className="w-3.5 h-3.5" /> Apply Now
-                  </button>
+                  <Link href={`/jobs/${job.id}`} className="flex-1 py-2.5 bg-accent text-white text-sm font-bold rounded-xl btn-press uppercase tracking-wider flex items-center justify-center gap-2" style={{ boxShadow: '4px 4px 8px rgba(166,50,60,0.3)' }}>
+                    View &amp; Compare <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                   <button onClick={() => toggleSave(job.id)}
                     className={`w-11 h-11 rounded-xl btn-press flex items-center justify-center ${saved.includes(job.id) ? 'bg-accent text-white' : 'text-[#4a5568]'}`}
                     style={{ boxShadow: saved.includes(job.id) ? '4px 4px 8px rgba(166,50,60,0.3)' : '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
@@ -124,7 +154,8 @@ export default function JobsPage() {
                   </button>
                 </div>
               </div>
-            ))}
+              )
+            })}
           </div>
         )}
       </div>

@@ -11,11 +11,11 @@ const postedJobs = [
 ]
 
 const recentApplicants = [
-  { name: 'Amirul Hakim', role: 'Senior Frontend Engineer', match: 94, status: 'Shortlisted', color: '#00b894', personality: { label: 'Builder', emoji: '🔨', color: '#e17055' } },
-  { name: 'Nur Syahirah', role: 'Senior Frontend Engineer', match: 88, status: 'Reviewed', color: '#6c5ce7', personality: { label: 'Architect', emoji: '🏗️', color: '#6c5ce7' } },
-  { name: 'Fadzil Azman', role: 'Data Analyst', match: 82, status: 'Pending', color: '#fdcb6e', personality: { label: 'Guardian', emoji: '🛡️', color: '#0984e3' } },
-  { name: 'Kavitha Raj', role: 'Data Analyst', match: 79, status: 'Pending', color: '#fdcb6e', personality: { label: 'Visionary', emoji: '💡', color: '#f39c12' } },
-  { name: 'Lee Wei Jian', role: 'Product Manager', match: 91, status: 'Interview', color: '#ff4757', personality: { label: 'Connector', emoji: '🤝', color: '#00b894' } },
+  { name: 'Amirul Hakim', role: 'Senior Frontend Engineer', match: 94, status: 'Shortlisted', color: '#00b894', personality: { label: 'Lion', emoji: '🦁', color: '#e17055' } },
+  { name: 'Nur Syahirah', role: 'Senior Frontend Engineer', match: 88, status: 'Reviewed', color: '#6c5ce7', personality: { label: 'Owl', emoji: '🦉', color: '#6c5ce7' } },
+  { name: 'Fadzil Azman', role: 'Data Analyst', match: 82, status: 'Pending', color: '#fdcb6e', personality: { label: 'Wolf', emoji: '🐺', color: '#0984e3' } },
+  { name: 'Kavitha Raj', role: 'Data Analyst', match: 79, status: 'Pending', color: '#fdcb6e', personality: { label: 'Fox', emoji: '🦊', color: '#f39c12' } },
+  { name: 'Lee Wei Jian', role: 'Product Manager', match: 91, status: 'Interview', color: '#ff4757', personality: { label: 'Dolphin', emoji: '🐬', color: '#00b894' } },
 ]
 
 const responseData = [
@@ -108,7 +108,10 @@ export default function EmployerPage() {
 
         {/* Recent Applicants */}
         <div className="card-screw rounded-2xl p-6" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-          <h3 className="font-bold uppercase tracking-widest text-sm mb-5" style={{ color: '#2d3436' }}>Recent Applicants</h3>
+          <div className="flex items-center justify-between mb-5">
+            <h3 className="font-bold uppercase tracking-widest text-sm" style={{ color: '#2d3436' }}>Recent Applicants</h3>
+            <span className="text-xs font-medium px-2.5 py-1 rounded-lg" style={{ background: '#8A6D1F18', color: '#8A6D1F' }}>🐾 YourAnimal culture-fit signal</span>
+          </div>
           <div className="flex flex-col gap-3">
             {recentApplicants.map((applicant, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl flex-wrap sm:flex-nowrap" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>

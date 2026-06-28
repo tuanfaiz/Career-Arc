@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Search, TrendingUp, BookOpen,
   ScanLine, DollarSign, Calculator, User, Bell, LogOut,
-  Building2, ChevronRight, MessageSquare, MailOpen, Menu, X, Target, FileText, Brain
+  Building2, ChevronRight, MessageSquare, MailOpen, Menu, X, Target, FileText, PawPrint,
+  School, Landmark, Globe, ListChecks, BarChart3
 } from 'lucide-react'
 
 type NavItem = { href: string; icon: React.ElementType; label: string }
@@ -24,13 +25,14 @@ const candidateGroups: NavGroup[] = [
       { href: '/profile', icon: User, label: 'My Profile' },
       { href: '/resume-builder', icon: FileText, label: 'Resume Builder' },
       { href: '/portfolio', icon: BookOpen, label: 'Portfolio' },
-      { href: '/aptitude-test', icon: Brain, label: 'Aptitude Test' },
+      { href: '/aptitude-test', icon: PawPrint, label: 'YourAnimal Test' },
     ],
   },
   {
     label: 'Find Jobs',
     items: [
       { href: '/jobs', icon: Search, label: 'Job Search' },
+      { href: '/companies', icon: Building2, label: 'Companies' },
       { href: '/ats-scanner', icon: ScanLine, label: 'ATS Scanner' },
     ],
   },
@@ -49,6 +51,12 @@ const candidateGroups: NavGroup[] = [
       { href: '/rejection-decoder', icon: MailOpen, label: 'Rejection Decoder' },
     ],
   },
+  {
+    label: 'Ecosystem',
+    items: [
+      { href: '/impact', icon: Globe, label: 'Impact & SDG' },
+    ],
+  },
 ]
 
 const employerGroups: NavGroup[] = [
@@ -56,13 +64,52 @@ const employerGroups: NavGroup[] = [
     label: 'Employer',
     items: [
       { href: '/employer', icon: Building2, label: 'Employer Dashboard' },
+      { href: '/impact', icon: Globe, label: 'Impact & SDG' },
     ],
   },
 ]
 
+const universityGroups: NavGroup[] = [
+  {
+    label: 'University',
+    items: [
+      { href: '/university', icon: School, label: 'Employability Dashboard' },
+      { href: '/university/interventions', icon: ListChecks, label: 'Intervention Queue' },
+      { href: '/university/skill-gaps', icon: BarChart3, label: 'Faculty Skill Gaps' },
+      { href: '/impact', icon: Globe, label: 'Impact & SDG' },
+    ],
+  },
+]
+
+const ministryGroups: NavGroup[] = [
+  {
+    label: 'Ministry',
+    items: [
+      { href: '/ministry', icon: Landmark, label: 'Ministry Dashboard' },
+      { href: '/impact', icon: Globe, label: 'Impact & SDG' },
+    ],
+  },
+]
+
+const groupsByRole: Record<string, NavGroup[]> = {
+  candidate: candidateGroups,
+  employer: employerGroups,
+  university: universityGroups,
+  ministry: ministryGroups,
+}
+
+const subtitleByRole: Record<string, string> = {
+  candidate: 'Fresh Grad · CS',
+  employer: 'Hiring Manager',
+  university: 'Career Services',
+  ministry: 'Policy & Planning',
+}
+
 const allItems: NavItem[] = [
   ...candidateGroups.flatMap(g => g.items),
   ...employerGroups.flatMap(g => g.items),
+  ...universityGroups.flatMap(g => g.items),
+  ...ministryGroups.flatMap(g => g.items),
 ]
 
 export default function DashboardLayout({ children }: { children: React.ReactNode; activePage?: string; title?: string }) {
@@ -96,9 +143,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     router.push('/login')
   }
 
-  const isEmployer = userRole === 'employer'
-  const groups = isEmployer ? employerGroups : candidateGroups
-  const roleSubtitle = isEmployer ? 'Hiring Manager' : 'Fresh Grad · CS'
+  const groups = groupsByRole[userRole] ?? candidateGroups
+  const roleSubtitle = subtitleByRole[userRole] ?? 'Fresh Grad · CS'
   const pageTitle = allItems.find(n => n.href === pathname)?.label ?? 'Career Arc'
 
   return (
