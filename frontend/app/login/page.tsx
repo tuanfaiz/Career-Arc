@@ -2,13 +2,15 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Target, Eye, EyeOff, AlertCircle, Zap, GraduationCap, Building2 } from 'lucide-react'
+import { Target, Eye, EyeOff, AlertCircle, Zap, GraduationCap, Building2, School, Landmark } from 'lucide-react'
 
-type Role = 'candidate' | 'employer'
+type Role = 'candidate' | 'employer' | 'university' | 'ministry'
 
-const demoAccounts: Record<Role, { email: string; password: string; name: string }> = {
-  candidate: { email: 'demo@careerarc.my', password: 'demo123', name: 'Amirul Hakim' },
-  employer: { email: 'employer@careerarc.my', password: 'demo123', name: 'Syarikat TechCorp' },
+const demoAccounts: Record<Role, { email: string; password: string; name: string; route: string; label: string }> = {
+  candidate: { email: 'demo@careerarc.my', password: 'demo123', name: 'Amirul Hakim', route: '/dashboard', label: 'Candidate' },
+  employer: { email: 'employer@careerarc.my', password: 'demo123', name: 'Syarikat TechCorp', route: '/employer', label: 'Employer' },
+  university: { email: 'university@careerarc.my', password: 'demo123', name: 'UPM Career Services', route: '/university', label: 'University' },
+  ministry: { email: 'ministry@careerarc.my', password: 'demo123', name: 'MOHE Planning Unit', route: '/ministry', label: 'Ministry' },
 }
 
 export default function LoginPage() {
@@ -45,14 +47,14 @@ export default function LoginPage() {
       localStorage.setItem('isLoggedIn', 'true')
       localStorage.setItem('userRole', role)
       localStorage.setItem('userName', acc.name)
-      router.push(role === 'employer' ? '/employer' : '/dashboard')
+      router.push(acc.route)
     } else {
       setError(`Invalid credentials. Try: ${acc.email} / demo123`)
       setLoading(false)
     }
   }
 
-  const isCandidate = role === 'candidate'
+  const roleLabel = demoAccounts[role].label
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: '#e0e5ec' }}>
@@ -77,6 +79,8 @@ export default function LoginPage() {
               {([
                 { r: 'candidate' as Role, icon: GraduationCap, label: 'Candidate', sub: 'Job seeker' },
                 { r: 'employer' as Role, icon: Building2, label: 'Employer', sub: 'Hiring manager' },
+                { r: 'university' as Role, icon: School, label: 'University', sub: 'Career services' },
+                { r: 'ministry' as Role, icon: Landmark, label: 'Ministry', sub: 'Policy & planning' },
               ]).map(({ r, icon: Icon, label, sub }) => (
                 <button
                   key={r}
@@ -103,7 +107,7 @@ export default function LoginPage() {
             className="w-full flex items-center justify-center gap-2 py-3 rounded-xl mb-5 text-xs uppercase tracking-widest font-bold btn-press transition-all"
             style={{ background: '#e0e5ec', color: '#ff4757', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff', border: '1px solid #d1d9e6' }}>
             <Zap size={14} />
-            Use Demo {isCandidate ? 'Candidate' : 'Employer'} Account
+            Use Demo {roleLabel} Account
           </button>
 
           <div className="flex items-center gap-3 mb-5">
@@ -148,7 +152,7 @@ export default function LoginPage() {
             <button type="submit" disabled={loading}
               className="w-full py-4 rounded-xl text-sm font-bold uppercase tracking-widest text-white btn-press transition-all mt-1"
               style={{ background: '#ff4757', boxShadow: '6px 6px 12px rgba(255,71,87,0.3)', opacity: loading ? 0.8 : 1 }}>
-              {loading ? 'Signing in...' : `Login as ${isCandidate ? 'Candidate' : 'Employer'}`}
+              {loading ? 'Signing in...' : `Login as ${roleLabel}`}
             </button>
           </form>
 

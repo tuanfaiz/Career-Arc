@@ -36,12 +36,12 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
-          {['/#features', '/jobs', '/employer'].map((href, i) => (
+          {['/#features', '/jobs', '/companies', '/employer'].map((href, i) => (
             <Link key={href} href={href} className="text-xs uppercase tracking-widest font-medium transition-colors"
               style={{ color: '#4a5568' }}
               onMouseEnter={e => (e.target as HTMLElement).style.color = '#ff4757'}
               onMouseLeave={e => (e.target as HTMLElement).style.color = '#4a5568'}>
-              {['Features', 'Jobs', 'For Employers'][i]}
+              {['Features', 'Jobs', 'Companies', 'For Employers'][i]}
             </Link>
           ))}
         </div>

@@ -110,6 +110,73 @@ export const mockJobs = [
   },
 ]
 
+export const mockCompanies = [
+  {
+    id: 'petronas-digital', name: 'Petronas Digital', logo: 'PD', logoColor: '#0066cc',
+    industry: 'Oil & Gas Tech', verified: true, yearsPartner: 9, rating: 4.6, reviews: 312,
+    antiGhost: 'green', antiGhostLabel: 'Active – Responds in 2 days', avgResponse: '2.0 days',
+    employees: '5,000+', hq: 'Kuala Lumpur', openRoles: 1,
+    about: "Petronas Digital is the technology arm of Malaysia's national energy company, building enterprise-grade platforms that power the country's energy transition.",
+    perks: ['Hybrid work', 'Annual bonus', 'Medical for family', 'Learning budget'],
+  },
+  {
+    id: 'grab-malaysia', name: 'Grab Malaysia', logo: 'GR', logoColor: '#00b14f',
+    industry: 'Tech / Ride-Hailing', verified: true, yearsPartner: 7, rating: 4.4, reviews: 528,
+    antiGhost: 'green', antiGhostLabel: 'Active – Responds in 1 day', avgResponse: '1.2 days',
+    employees: '8,000+', hq: 'Petaling Jaya', openRoles: 1,
+    about: "Grab is Southeast Asia's leading super app, serving millions daily across deliveries, mobility, and financial services from its Malaysian engineering hubs.",
+    perks: ['Remote-friendly', 'Stock options', 'Wellness allowance', 'Flexible hours'],
+  },
+  {
+    id: 'cimb-bank', name: 'CIMB Bank', logo: 'CB', logoColor: '#cc0000',
+    industry: 'Banking & Finance', verified: true, yearsPartner: 12, rating: 4.1,
+    antiGhost: 'yellow', antiGhostLabel: 'Passive – Last seen 3 weeks ago', avgResponse: '11 days',
+    employees: '13,000+', hq: 'Kuala Lumpur', openRoles: 1, reviews: 389,
+    about: "CIMB is one of ASEAN's largest banking groups, modernising core banking and digital channels across the region.",
+    perks: ['Staff loan rates', 'Structured grad scheme', 'Medical', 'Gym subsidy'],
+  },
+  {
+    id: 'airasia-digital', name: 'AirAsia Digital', logo: 'AA', logoColor: '#d90429',
+    industry: 'Aviation Tech', verified: true, yearsPartner: 6, rating: 4.3, reviews: 274,
+    antiGhost: 'green', antiGhostLabel: 'Active – Responds in 3 days', avgResponse: '2.8 days',
+    employees: '3,000+', hq: 'Sepang', openRoles: 1,
+    about: "AirAsia Digital builds the travel and lifestyle super app behind Southeast Asia's largest low-cost carrier.",
+    perks: ['Free flights', 'Remote-friendly', 'Startup culture', 'Stock options'],
+  },
+  {
+    id: 'goget', name: 'GoGet Malaysia', logo: 'GG', logoColor: '#7c3aed',
+    industry: 'Gig Economy', verified: false, yearsPartner: 2, rating: 4.0, reviews: 86,
+    antiGhost: 'green', antiGhostLabel: 'Active – Responds in 2 days', avgResponse: '2.3 days',
+    employees: '200+', hq: 'Bangsar South, KL', openRoles: 1,
+    about: "GoGet runs Malaysia's largest on-demand workforce platform, connecting businesses with verified part-time workers.",
+    perks: ['Flat hierarchy', 'Equity', 'Flexible hours', 'Pet-friendly office'],
+  },
+  {
+    id: 'touch-n-go', name: "Touch 'n Go Digital", logo: 'TG', logoColor: '#0099e6',
+    industry: 'Fintech', verified: true, yearsPartner: 5, rating: 3.8, reviews: 197,
+    antiGhost: 'red', antiGhostLabel: 'Ghosting Risk – No response in 6 weeks', avgResponse: '42 days',
+    employees: '1,500+', hq: 'Kuala Lumpur', openRoles: 1,
+    about: "Touch 'n Go Digital operates Malaysia's most-used e-wallet, powering millions of daily transactions.",
+    perks: ['Hybrid work', 'Performance bonus', 'Medical', 'Phone allowance'],
+  },
+  {
+    id: 'shopee-malaysia', name: 'Shopee Malaysia', logo: 'SP', logoColor: '#ee4d2d',
+    industry: 'E-Commerce', verified: true, yearsPartner: 6, rating: 4.0, reviews: 441,
+    antiGhost: 'green', antiGhostLabel: 'Active – Responds in 1 day', avgResponse: '1.5 days',
+    employees: '4,000+', hq: 'Petaling Jaya', openRoles: 1,
+    about: "Shopee is the leading e-commerce platform in Southeast Asia, with a fast-paced engineering and design culture in Malaysia.",
+    perks: ['Stock options', 'Shopping vouchers', 'Free shuttle', 'Career mobility'],
+  },
+  {
+    id: 'fusionex', name: 'Fusionex International', logo: 'FX', logoColor: '#6d28d9',
+    industry: 'AI & Big Data', verified: false, yearsPartner: 3, rating: 3.9, reviews: 64,
+    antiGhost: 'yellow', antiGhostLabel: 'Passive – Last seen 1 week ago', avgResponse: '6 days',
+    employees: '800+', hq: 'Kuala Lumpur', openRoles: 1,
+    about: 'Fusionex builds AI, analytics, and big-data platforms for enterprise clients across ASEAN markets.',
+    perks: ['Training certs', 'Project bonuses', 'Medical', 'Flexible hours'],
+  },
+]
+
 export const mockApplications = [
   { id: '1', jobTitle: 'Junior Software Engineer', company: 'Petronas Digital', appliedDate: '20 May 2024', status: 'Interview Scheduled', statusColor: 'green', antiGhost: 'green', antiGhostLabel: 'Active – Responds in 2 days', nextStep: 'Technical Interview on 28 May' },
   { id: '2', jobTitle: 'Frontend Developer', company: 'AirAsia Digital', appliedDate: '18 May 2024', status: 'Under Review', statusColor: 'blue', antiGhost: 'green', antiGhostLabel: 'Active – Responds in 3 days', nextStep: 'Awaiting HR screening' },
@@ -175,6 +242,88 @@ export const mockEmployerStats = {
   jobsPosted: 8, totalApplicants: 156, shortlisted: 23,
   avgResponseTime: '2.1 days', antiGhostScore: 'green', antiGhostLabel: 'ACTIVE',
 }
+
+export const mockUniversityStats = {
+  name: 'Universiti Putra Malaysia (UPM)',
+  graduatesTracked: 4820,
+  employmentRate: 87,
+  avgTimeToHire: 3.2,
+  avgStartingSalary: 3400,
+  withinField: 74,
+  programs: [
+    { name: 'Computer Science', employed: 92, grads: 540 },
+    { name: 'Engineering', employed: 88, grads: 880 },
+    { name: 'Business & Accounting', employed: 83, grads: 760 },
+    { name: 'Design & Media', employed: 79, grads: 320 },
+    { name: 'Life Sciences', employed: 71, grads: 610 },
+  ],
+  pipeline: [
+    { stage: 'Graduated', value: 4820, pct: 100 },
+    { stage: 'Actively applying', value: 3950, pct: 82 },
+    { stage: 'Interviewing', value: 2480, pct: 51 },
+    { stage: 'Offer received', value: 1760, pct: 37 },
+    { stage: 'Employed', value: 4190, pct: 87 },
+  ],
+  topPartners: [
+    { name: 'Petronas Digital', hires: 84 },
+    { name: 'Grab Malaysia', hires: 67 },
+    { name: 'CIMB Bank', hires: 59 },
+    { name: 'AirAsia Digital', hires: 41 },
+    { name: 'Shopee Malaysia', hires: 38 },
+  ],
+}
+
+export const mockMinistryStats = {
+  body: 'Ministry of Higher Education (MOHE)',
+  graduatesNational: 312000,
+  employmentRate: 84,
+  avgTimeToHire: 3.8,
+  universitiesTracked: 50,
+  byField: [
+    { field: 'ICT & Computing', employed: 89 },
+    { field: 'Health Sciences', employed: 88 },
+    { field: 'Engineering', employed: 85 },
+    { field: 'Business & Finance', employed: 82 },
+    { field: 'Education', employed: 80 },
+    { field: 'Arts & Humanities', employed: 73 },
+  ],
+  trend: [
+    { year: '2021', rate: 75 },
+    { year: '2022', rate: 78 },
+    { year: '2023', rate: 81 },
+    { year: '2024', rate: 84 },
+  ],
+  topSectors: [
+    { sector: 'Technology', share: 28 },
+    { sector: 'Financial Services', share: 19 },
+    { sector: 'Manufacturing', share: 16 },
+    { sector: 'Healthcare', share: 12 },
+    { sector: 'Public Sector', share: 11 },
+  ],
+}
+
+// UN Sustainable Development Goals the product is aligned to (impact framing)
+export const sdgGoals = [
+  {
+    number: 4, title: 'Quality Education', color: '#c5192d',
+    contribution: 'Tracer-study and employability data helps universities close skill gaps and align curricula with real hiring demand.',
+  },
+  {
+    number: 8, title: 'Decent Work & Economic Growth', color: '#a21942',
+    contribution: 'Fair-pay benchmarks and anti-ghosting accountability raise the quality, transparency and dignity of early-career employment.',
+  },
+  {
+    number: 17, title: 'Partnerships for the Goals', color: '#19486a',
+    contribution: 'One transparent platform connecting candidates, employers, universities and the ministry around shared outcomes.',
+  },
+]
+
+export const mockImpactMetrics = [
+  { label: 'Graduates supported', value: '312K', sub: 'across 50 Malaysian universities' },
+  { label: 'Employability uplift', value: '+9pts', sub: 'from 75% to 84% over 3 years' },
+  { label: 'Faster time-to-hire', value: '−28%', sub: 'avg 5.3 → 3.8 months' },
+  { label: 'Ghosting reduced', value: '−61%', sub: 'on Anti-Ghost verified employers' },
+]
 
 export const mockCandidates = [
   { id: '1', name: 'Amirul Hakim', role: 'Fresh Graduate · CS', atsScore: 94, experience: '0 yrs', status: 'Shortlisted', university: 'UPM' },

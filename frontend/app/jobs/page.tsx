@@ -1,8 +1,12 @@
 'use client'
 import { useState } from 'react'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
-import { mockJobs } from '@/lib/mockData'
-import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ExternalLink } from 'lucide-react'
+import { mockJobs, mockCompanies } from '@/lib/mockData'
+import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ExternalLink, BadgeCheck } from 'lucide-react'
+
+const companyByName: Record<string, { id: string; verified: boolean }> =
+  Object.fromEntries(mockCompanies.map(c => [c.name, { id: c.id, verified: c.verified }]))
 
 export default function JobsPage() {
   const [query, setQuery] = useState('')
@@ -84,7 +88,15 @@ export default function JobsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-bold text-[#2d3436] truncate">{job.title}</h3>
-                    <div className="text-sm text-[#4a5568]">{job.company}</div>
+                    {companyByName[job.company] ? (
+                      <Link href={`/companies/${companyByName[job.company].id}`}
+                        className="text-sm inline-flex items-center gap-1 hover:underline" style={{ color: '#4a5568' }}>
+                        {job.company}
+                        {companyByName[job.company].verified && <BadgeCheck className="w-3.5 h-3.5" style={{ color: '#8A6D1F' }} />}
+                      </Link>
+                    ) : (
+                      <div className="text-sm text-[#4a5568]">{job.company}</div>
+                    )}
                   </div>
                   <div className="px-3 py-1.5 rounded-xl text-sm font-mono font-bold flex-shrink-0" style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757' }}>
                     {job.matchPercent}% Match
