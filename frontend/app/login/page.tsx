@@ -36,6 +36,20 @@ export default function LoginPage() {
     setError('')
   }
 
+  function quickLogin(r: Role) {
+    const acc = demoAccounts[r]
+    localStorage.setItem('isLoggedIn', 'true')
+    localStorage.setItem('userRole', r)
+    localStorage.setItem('userName', acc.name)
+    if (r === 'candidate') {
+      localStorage.removeItem('onboardingComplete')
+      localStorage.removeItem('careerProfile')
+      router.push('/onboarding')
+    } else {
+      router.push(acc.route)
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
@@ -70,6 +84,34 @@ export default function LoginPage() {
               CAREER <span style={{ color: '#ff4757' }}>ARC</span>
             </h1>
             <p className="text-sm mt-1" style={{ color: '#4a5568' }}>Navigate your 40-year career journey</p>
+          </div>
+
+          {/* One-click demo access (for judges) */}
+          <div className="mb-6">
+            <p className="text-xs font-mono font-bold uppercase tracking-widest mb-3 text-center flex items-center justify-center gap-1.5" style={{ color: '#ff4757' }}>
+              <Zap size={12} /> One-click demo access
+            </p>
+            <div className="grid grid-cols-2 gap-3">
+              {([
+                { r: 'candidate' as Role, icon: GraduationCap, label: 'Candidate' },
+                { r: 'employer' as Role, icon: Building2, label: 'Employer' },
+                { r: 'university' as Role, icon: School, label: 'University' },
+                { r: 'ministry' as Role, icon: Landmark, label: 'Ministry' },
+              ]).map(({ r, icon: Icon, label }) => (
+                <button key={r} onClick={() => quickLogin(r)}
+                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold btn-press transition-all"
+                  style={{ background: '#ff4757', color: '#ffffff', boxShadow: '4px 4px 10px rgba(255,71,87,0.3)' }}>
+                  <Icon className="w-4 h-4" /> {label}
+                </button>
+              ))}
+            </div>
+            <p className="text-xs text-center mt-2" style={{ color: '#4a5568' }}>Enter instantly — no password needed.</p>
+          </div>
+
+          <div className="flex items-center gap-3 mb-6">
+            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
+            <span className="text-xs uppercase tracking-widest" style={{ color: '#4a5568' }}>or sign in manually</span>
+            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
           </div>
 
           {/* Role selector */}

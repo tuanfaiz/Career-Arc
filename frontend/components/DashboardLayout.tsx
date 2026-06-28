@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, TrendingUp, BookOpen,
   ScanLine, DollarSign, Calculator, User, Bell, LogOut,
   Building2, ChevronRight, MessageSquare, MailOpen, Menu, X, Target, FileText, PawPrint,
-  School, Landmark, Globe
+  School, Landmark, Globe, ListChecks, BarChart3
 } from 'lucide-react'
 
 type NavItem = { href: string; icon: React.ElementType; label: string }
@@ -73,7 +73,9 @@ const universityGroups: NavGroup[] = [
   {
     label: 'University',
     items: [
-      { href: '/university', icon: School, label: 'University Dashboard' },
+      { href: '/university', icon: School, label: 'Employability Dashboard' },
+      { href: '/university/interventions', icon: ListChecks, label: 'Intervention Queue' },
+      { href: '/university/skill-gaps', icon: BarChart3, label: 'Faculty Skill Gaps' },
       { href: '/impact', icon: Globe, label: 'Impact & SDG' },
     ],
   },

@@ -1,154 +1,166 @@
 'use client'
-import DashboardLayout from '@/components/DashboardLayout'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { mockApplications, mockJobs, mockUser } from '@/lib/mockData'
-import { ArrowRight, TrendingUp, Eye, FileText, Target, Send } from 'lucide-react'
+import DashboardLayout from '@/components/DashboardLayout'
+import { mockJobs } from '@/lib/mockData'
+import { defaultProfile, levelByKey, nextActionText } from '@/lib/careerData'
+import {
+  computeCrs, riskOf, riskMeta, compatibility, CRS_LABELS, type CrsBreakdown, type Level,
+} from '@/lib/scoring'
+import { ArrowRight, Sparkles, FileText, Target, TrendingUp, DollarSign, Lightbulb } from 'lucide-react'
 
-const statusColors: Record<string, string> = {
-  green: 'bg-[#00b894] text-white',
-  blue: 'bg-[#0984e3] text-white',
-  yellow: 'bg-[#fdcb6e] text-[#2d3436]',
-  red: 'bg-[#ff4757] text-white',
-  purple: 'bg-[#6c5ce7] text-white',
+interface Profile {
+  name: string; level: Level; programme: string; university: string
+  skills: string[]; animal?: string | null; breakdown: CrsBreakdown
 }
 
 export default function DashboardPage() {
-  const topJobs = mockJobs.filter(j => j.matchPercent >= 87).slice(0, 3)
+  const router = useRouter()
+  const [profile, setProfile] = useState<Profile | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    if (localStorage.getItem('isLoggedIn') !== 'true') { router.push('/login'); return }
+    if (localStorage.getItem('onboardingComplete') !== 'true') { router.push('/onboarding'); return }
+    const raw = localStorage.getItem('careerProfile')
+    try { setProfile(raw ? JSON.parse(raw) : (defaultProfile as Profile)) }
+    catch { setProfile(defaultProfile as Profile) }
+  }, [router])
+
+  if (!profile) {
+    return <DashboardLayout><div className="py-20 text-center font-mono" style={{ color: '#4a5568' }}>Loading your readiness…</div></DashboardLayout>
+  }
+
+  const b = profile.breakdown
+  const crs = computeCrs(b)
+  const risk = riskOf(crs)
+  const rm = riskMeta[risk]
+  const lead = levelByKey[profile.level]?.dashboardLead ?? 'jobs'
+
+  const ranked = mockJobs
+    .map(j => ({ job: j, comp: compatibility(profile.skills, j.skills) }))
+    .sort((a, b2) => b2.comp.score - a.comp.score)
+  const topJobs = ranked.slice(0, 3)
+
+  const outcomeStats = [
+    { label: 'ATS Score', value: `${b.ats}`, icon: Target, color: '#ff4757' },
+    { label: 'Resume Strength', value: `${b.resume}`, icon: FileText, color: '#0984e3' },
+    { label: 'Skill Match', value: `${b.skillMatch}`, icon: Sparkles, color: '#6c5ce7' },
+    { label: 'Top Job Match', value: `${ranked[0]?.comp.score ?? 0}%`, icon: TrendingUp, color: '#00b894' },
+  ]
+
+  const leadCard = {
+    jobs: { href: '/jobs', label: 'Browse recommended jobs', icon: TrendingUp },
+    salary: { href: '/salary', label: 'Check your market salary', icon: DollarSign },
+    path: { href: '/career-path', label: 'Plan your next move', icon: ArrowRight },
+  }[lead]
 
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        {/* Welcome */}
-        <div className="card-screw rounded-2xl p-6" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-[#2d3436] mb-1">Good morning, {mockUser.name}! 👋</h2>
-              <div className="flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold" style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757' }}>{mockUser.role}</span>
-                <span className="text-[#4a5568] text-sm">·</span>
-                <span className="text-sm text-[#4a5568]">{mockUser.field} · {mockUser.university}</span>
+        {/* Hero: CRS */}
+        <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex flex-col md:flex-row items-center gap-6">
+            <Ring value={crs} color={rm.color} />
+            <div className="flex-1 min-w-0 text-center md:text-left">
+              <h2 className="text-2xl font-black" style={{ color: '#2d3436' }}>Hi {profile.name.split(' ')[0]} 👋 You&apos;re {crs}% career-ready</h2>
+              <div className="flex items-center gap-2 justify-center md:justify-start mt-2 flex-wrap">
+                <span className="px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: rm.bg, color: rm.color }}>{rm.label}</span>
+                <span className="px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757' }}>{levelByKey[profile.level]?.label}</span>
+                {profile.animal && <span className="px-2.5 py-1 rounded-lg text-xs font-bold" style={{ background: '#8A6D1F18', color: '#8A6D1F' }}>🐾 {profile.animal}</span>}
+                <span className="text-sm" style={{ color: '#4a5568' }}>{profile.programme}</span>
               </div>
-            </div>
-            <div className="hidden md:flex items-center gap-2 px-4 py-2 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff' }}>
-              <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: '#00b894', boxShadow: '0 0 6px rgba(0,184,148,0.6)' }}></span>
-              <span className="text-xs font-mono text-[#4a5568] uppercase tracking-wider">Profile 78% Complete</span>
+              {/* breakdown bars */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 mt-5">
+                {(Object.keys(b) as (keyof CrsBreakdown)[]).map(k => (
+                  <div key={k}>
+                    <div className="flex justify-between text-xs mb-1" style={{ color: '#4a5568' }}><span>{CRS_LABELS[k]}</span><span className="font-mono font-bold">{b[k]}</span></div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#e0e5ec', boxShadow: 'inset 1px 1px 2px #babecc, inset -1px -1px 2px #ffffff' }}>
+                      <div className="h-full rounded-full" style={{ width: `${b[k]}%`, background: rm.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[
-            { icon: Send, label: 'Applications Sent', value: String(mockUser.applicationsSent), sub: '+3 this week', color: '#0984e3' },
-            { icon: Eye, label: 'Profile Views', value: String(mockUser.profileViews), sub: '+18 today', color: '#6c5ce7' },
-            { icon: Target, label: 'ATS Score', value: `${mockUser.atsScore}%`, sub: 'Above average', color: '#ff4757' },
-            { icon: TrendingUp, label: 'Top Job Match', value: '96%', sub: 'AirAsia Digital', color: '#00b894' },
-          ].map(s => (
-            <div key={s.label} className="card-hover rounded-2xl p-5" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: '#e0e5ec', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
-                <s.icon className="w-5 h-5" style={{ color: s.color }} />
-              </div>
-              <div className="text-2xl font-mono font-bold text-[#2d3436] mb-0.5">{s.value}</div>
-              <div className="text-xs text-[#4a5568] font-medium">{s.label}</div>
-              <div className="text-xs font-mono mt-1" style={{ color: s.color }}>{s.sub}</div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Applications */}
-          <div className="lg:col-span-2 rounded-2xl overflow-hidden" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-            <div className="flex items-center justify-between px-6 py-4 border-b border-[#babecc]/50">
-              <h3 className="font-bold text-[#2d3436]">Recent Applications</h3>
-              <Link href="/jobs" className="text-xs text-accent font-semibold flex items-center gap-1">
-                Find More Jobs <ArrowRight className="w-3 h-3" />
-              </Link>
-            </div>
-            <div className="divide-y divide-[#babecc]/30">
-              {mockApplications.map(app => (
-                <div key={app.id} className="flex items-center gap-4 px-6 py-4">
-                  <div className="w-9 h-9 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
-                    <FileText className="w-4 h-4 text-accent" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-semibold text-[#2d3436] truncate">{app.jobTitle}</div>
-                    <div className="text-xs text-[#4a5568]">{app.company}</div>
-                  </div>
-                  <div className="hidden sm:flex items-center gap-1.5 text-xs font-mono text-[#4a5568]">
-                    <span className="w-2 h-2 rounded-full" style={{ background: app.antiGhost === 'green' ? '#00b894' : app.antiGhost === 'yellow' ? '#fdcb6e' : '#ff4757' }}></span>
-                    <span className="hidden md:inline truncate max-w-[120px]">{app.antiGhostLabel}</span>
-                  </div>
-                  <span className={`px-2.5 py-1 rounded-lg text-xs font-mono font-bold whitespace-nowrap ${statusColors[app.statusColor]}`}>
-                    {app.status}
-                  </span>
-                </div>
-              ))}
-            </div>
+        {/* Suggested next action (AI) */}
+        <div className="rounded-2xl p-5 flex items-start gap-4" style={{ background: 'linear-gradient(135deg, #f0f2f5 0%, #fff8ec 100%)', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff', border: '1px solid #f39c1233' }}>
+          <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#f39c12', boxShadow: '4px 4px 8px rgba(243,156,18,0.3)' }}>
+            <Lightbulb className="w-5 h-5 text-white" />
           </div>
-
-          {/* Career Arc Preview */}
-          <div className="rounded-2xl p-6" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-            <h3 className="font-bold text-[#2d3436] mb-4">Your Career Arc</h3>
-            <div className="space-y-3 mb-6">
-              {[
-                { year: '2023', role: 'Junior Developer', salary: 'RM 3.5K', active: true },
-                { year: '2025', role: 'Mid-Level Dev', salary: 'RM 6K', active: false },
-                { year: '2028', role: 'Senior Developer', salary: 'RM 10K', active: false },
-                { year: '2031+', role: 'Tech Lead / PM / Founder', salary: 'RM 15K+', active: false },
-              ].map((node, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="flex flex-col items-center">
-                    <div className="w-3 h-3 rounded-full mt-0.5" style={node.active ? { background: '#ff4757', boxShadow: '0 0 8px rgba(255,71,87,0.5)' } : { background: '#babecc' }}></div>
-                    {i < 3 && <div className="w-px h-6 bg-[#babecc]"></div>}
-                  </div>
-                  <div className="flex-1 pb-2">
-                    <div className="text-xs font-mono text-[#4a5568] mb-0.5">{node.year}</div>
-                    <div className={`text-sm font-semibold ${node.active ? 'text-accent' : 'text-[#2d3436]'}`}>{node.role}</div>
-                    <div className="text-xs font-mono text-[#4a5568]">{node.salary}</div>
-                  </div>
-                </div>
-              ))}
+          <div className="flex-1">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Sparkles className="w-3.5 h-3.5" style={{ color: '#f39c12' }} />
+              <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#f39c12' }}>AI · Suggested next action</span>
             </div>
-            <Link href="/career-path" className="flex items-center justify-center gap-2 w-full py-3 bg-accent text-white text-sm font-bold rounded-xl btn-press uppercase tracking-wider" style={{ boxShadow: '4px 4px 8px rgba(166,50,60,0.3)' }}>
-              View Full Simulator <ArrowRight className="w-4 h-4" />
+            <p className="text-sm" style={{ color: '#2d3436' }}>{nextActionText(b)}</p>
+            <Link href={leadCard.href} className="inline-flex items-center gap-1.5 mt-3 px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-widest text-white btn-press" style={{ background: '#f39c12', boxShadow: '4px 4px 8px rgba(243,156,18,0.3)' }}>
+              <leadCard.icon className="w-3.5 h-3.5" /> {leadCard.label}
             </Link>
           </div>
         </div>
 
-        {/* Recommended Jobs */}
+        {/* Outcome stats */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {outcomeStats.map(s => (
+            <div key={s.label} className="card-hover rounded-2xl p-5" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3" style={{ background: '#e0e5ec', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+                <s.icon className="w-5 h-5" style={{ color: s.color }} />
+              </div>
+              <div className="text-2xl font-mono font-bold mb-0.5" style={{ color: '#2d3436' }}>{s.value}</div>
+              <div className="text-xs font-medium" style={{ color: '#4a5568' }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Recommended jobs (ranked by compatibility) */}
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-[#2d3436]">Recommended for You</h3>
-            <Link href="/jobs" className="text-xs text-accent font-semibold flex items-center gap-1">See all <ArrowRight className="w-3 h-3" /></Link>
+            <h3 className="font-bold" style={{ color: '#2d3436' }}>Recommended for you <span className="text-xs font-mono font-normal" style={{ color: '#4a5568' }}>· ranked by your skills</span></h3>
+            <Link href="/jobs" className="text-xs font-semibold flex items-center gap-1" style={{ color: '#ff4757' }}>See all <ArrowRight className="w-3 h-3" /></Link>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
-            {topJobs.map(job => (
-              <div key={job.id} className="card-hover rounded-2xl p-5" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+            {topJobs.map(({ job, comp }) => (
+              <Link key={job.id} href={`/jobs/${job.id}`} className="card-hover rounded-2xl p-5 block" style={{ background: '#e0e5ec', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold font-mono flex-shrink-0" style={{ background: job.logoColor }}>
-                    {job.logo}
-                  </div>
+                  <div className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold font-mono flex-shrink-0" style={{ background: job.logoColor }}>{job.logo}</div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-bold text-[#2d3436] truncate">{job.title}</div>
-                    <div className="text-xs text-[#4a5568] truncate">{job.company}</div>
+                    <div className="text-sm font-bold truncate" style={{ color: '#2d3436' }}>{job.title}</div>
+                    <div className="text-xs truncate" style={{ color: '#4a5568' }}>{job.company}</div>
                   </div>
-                  <div className="px-2 py-1 rounded-lg text-xs font-mono font-bold flex-shrink-0" style={{ background: 'rgba(255,71,87,0.1)', color: '#ff4757' }}>
-                    {job.matchPercent}%
-                  </div>
+                  <div className="px-2 py-1 rounded-lg text-xs font-mono font-bold flex-shrink-0" style={{ background: comp.score >= 85 ? '#00b89422' : comp.score >= 60 ? '#fdcb6e33' : '#ff475722', color: comp.score >= 85 ? '#00b894' : comp.score >= 60 ? '#b9831f' : '#ff4757' }}>{comp.score}%</div>
                 </div>
-                <div className="text-xs font-mono text-[#4a5568] mb-3">{job.salary} · {job.location}</div>
-                <div className="flex items-center gap-1.5 mb-4">
-                  <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: job.antiGhost === 'green' ? '#00b894' : '#fdcb6e' }}></span>
-                  <span className="text-xs text-[#4a5568] truncate">{job.antiGhostLabel}</span>
-                </div>
-                <Link href="/jobs" className="flex items-center justify-center gap-1 w-full py-2.5 text-sm font-semibold rounded-xl btn-press text-[#2d3436]" style={{ boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
-                  View Job <ArrowRight className="w-3 h-3" />
-                </Link>
-              </div>
+                <div className="text-xs font-mono mb-3" style={{ color: '#4a5568' }}>{job.salary} · {job.location}</div>
+                {comp.missing.length > 0 && (
+                  <div className="text-xs mb-3" style={{ color: '#4a5568' }}>Missing: {comp.missing.slice(0, 2).map(m => <span key={m} className="font-medium" style={{ color: '#ff4757' }}>{m} </span>)}</div>
+                )}
+                <span className="flex items-center justify-center gap-1 w-full py-2.5 text-sm font-semibold rounded-xl" style={{ color: '#2d3436', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+                  View &amp; compare <ArrowRight className="w-3 h-3" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </div>
     </DashboardLayout>
+  )
+}
+
+function Ring({ value, color }: { value: number; color: string }) {
+  const r = 50, c = 2 * Math.PI * r, off = c - (value / 100) * c
+  return (
+    <div className="relative inline-flex items-center justify-center flex-shrink-0">
+      <svg width="132" height="132" className="-rotate-90">
+        <circle cx="66" cy="66" r={r} fill="none" stroke="#d1d9e6" strokeWidth="12" />
+        <circle cx="66" cy="66" r={r} fill="none" stroke={color} strokeWidth="12" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={off} style={{ transition: 'stroke-dashoffset 0.8s ease' }} />
+      </svg>
+      <div className="absolute flex flex-col items-center">
+        <span className="text-4xl font-black font-mono" style={{ color }}>{value}</span>
+        <span className="text-xs" style={{ color: '#4a5568' }}>readiness</span>
+      </div>
+    </div>
   )
 }
