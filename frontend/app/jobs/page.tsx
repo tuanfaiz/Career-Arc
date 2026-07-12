@@ -4,8 +4,9 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { mockJobs, mockCompanies } from '@/lib/mockData'
 import { defaultProfile } from '@/lib/careerData'
+import { readMyApplications } from '@/lib/applications'
 import { compatibility } from '@/lib/scoring'
-import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ArrowRight, BadgeCheck } from 'lucide-react'
+import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ArrowRight, BadgeCheck, Check } from 'lucide-react'
 
 const companyByName: Record<string, { id: string; verified: boolean }> =
   Object.fromEntries(mockCompanies.map(c => [c.name, { id: c.id, verified: c.verified }]))
@@ -16,10 +17,12 @@ export default function JobsPage() {
   const [filterGhost, setFilterGhost] = useState('All')
   const [saved, setSaved] = useState<string[]>([])
   const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
+  const [appliedIds, setAppliedIds] = useState<string[]>([])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
     try { const raw = localStorage.getItem('careerProfile'); if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills) } } catch { /* defaults */ }
+    setAppliedIds(readMyApplications().map(a => a.jobId))
   }, [])
 
   const expOptions = ['All', 'Junior (0–2 yrs)', 'Mid (2–5 yrs)']
@@ -110,8 +113,15 @@ export default function JobsPage() {
                       <div className="text-sm text-[#4a5568]">{job.company}</div>
                     )}
                   </div>
-                  <div className="px-3 py-1.5 rounded-xl text-sm font-mono font-bold flex-shrink-0" style={{ background: cBg, color: cColor }}>
-                    {comp.score}% Match
+                  <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+                    <div className="px-3 py-1.5 rounded-xl text-sm font-mono font-bold" style={{ background: cBg, color: cColor }}>
+                      {comp.score}% Match
+                    </div>
+                    {appliedIds.includes(job.id) && (
+                      <span className="flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold" style={{ background: '#00b89418', color: '#00b894' }}>
+                        <Check className="w-3 h-3" /> Applied
+                      </span>
+                    )}
                   </div>
                 </div>
 

@@ -8,9 +8,10 @@ import { jobDetails, defaultProfile, levelByKey, jobVerdictText, type JobDetail 
 import {
   compatibility, verdictOf, verdictMeta, type Level,
 } from '@/lib/scoring'
+import { readMyApplications, addApplication } from '@/lib/applications'
 import {
   ArrowLeft, MapPin, Briefcase, Sparkles, Check, X, ExternalLink, BadgeCheck,
-  TrendingUp, Wifi, DollarSign,
+  TrendingUp, Wifi, DollarSign, Send,
 } from 'lucide-react'
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -22,6 +23,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
   const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
   const [level, setLevel] = useState<Level>(defaultProfile.level)
+  const [applied, setApplied] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -29,7 +31,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       const raw = localStorage.getItem('careerProfile')
       if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills); if (p.level) setLevel(p.level) }
     } catch { /* keep defaults */ }
-  }, [])
+    setApplied(readMyApplications().some(a => a.jobId === id))
+  }, [id])
+
+  function handleApply() {
+    addApplication(id)
+    setApplied(true)
+  }
 
   const allSkills = [...job.skills, ...(detail?.niceToHave ?? [])]
   const comp = compatibility(skills, allSkills)
@@ -157,9 +165,20 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         )}
 
         {/* Apply */}
-        <button className="w-full py-4 rounded-2xl text-sm font-bold uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2" style={{ background: '#ff4757', boxShadow: '6px 6px 14px rgba(255,71,87,0.35)' }}>
-          <ExternalLink className="w-4 h-4" /> Apply now
-        </button>
+        {applied ? (
+          <div className="space-y-3">
+            <div className="w-full py-4 rounded-2xl text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2" style={{ background: '#00b89418', color: '#00b894', border: '1px solid #00b89444' }}>
+              <Check className="w-4 h-4" /> Application submitted
+            </div>
+            <Link href="/applications" className="w-full py-3.5 rounded-2xl text-sm font-bold uppercase tracking-widest btn-press flex items-center justify-center gap-2" style={{ background: '#e0e5ec', color: '#4a5568', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+              <Send className="w-4 h-4" /> Track my applications
+            </Link>
+          </div>
+        ) : (
+          <button onClick={handleApply} className="w-full py-4 rounded-2xl text-sm font-bold uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2" style={{ background: '#ff4757', boxShadow: '6px 6px 14px rgba(255,71,87,0.35)' }}>
+            <Send className="w-4 h-4" /> Apply now
+          </button>
+        )}
       </div>
     </DashboardLayout>
   )

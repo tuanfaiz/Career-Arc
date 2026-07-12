@@ -22,13 +22,6 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  function fillDemo() {
-    const acc = demoAccounts[role]
-    setEmail(acc.email)
-    setPassword(acc.password)
-    setError('')
-  }
-
   function selectRole(r: Role) {
     setRole(r)
     setEmail('')
@@ -142,20 +135,6 @@ export default function LoginPage() {
                 </button>
               ))}
             </div>
-          </div>
-
-          {/* Demo button */}
-          <button onClick={fillDemo}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl mb-5 text-xs uppercase tracking-widest font-bold btn-press transition-all"
-            style={{ background: '#e0e5ec', color: '#ff4757', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff', border: '1px solid #d1d9e6' }}>
-            <Zap size={14} />
-            Use Demo {roleLabel} Account
-          </button>
-
-          <div className="flex items-center gap-3 mb-5">
-            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
-            <span className="text-xs uppercase tracking-widest" style={{ color: '#4a5568' }}>or sign in</span>
-            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">

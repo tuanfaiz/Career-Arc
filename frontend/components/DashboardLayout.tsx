@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, TrendingUp, BookOpen,
   ScanLine, DollarSign, Calculator, User, Bell, LogOut,
   Building2, ChevronRight, MessageSquare, MailOpen, Menu, X, Target, FileText, PawPrint,
-  School, Landmark, Globe, ListChecks, BarChart3
+  School, Landmark, Globe, ListChecks, BarChart3, ArrowLeft, Send
 } from 'lucide-react'
 
 type NavItem = { href: string; icon: React.ElementType; label: string }
@@ -32,6 +32,7 @@ const candidateGroups: NavGroup[] = [
     label: 'Find Jobs',
     items: [
       { href: '/jobs', icon: Search, label: 'Job Search' },
+      { href: '/applications', icon: Send, label: 'My Applications' },
       { href: '/companies', icon: Building2, label: 'Companies' },
       { href: '/ats-scanner', icon: ScanLine, label: 'ATS Scanner' },
     ],
@@ -146,6 +147,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const groups = groupsByRole[userRole] ?? candidateGroups
   const roleSubtitle = subtitleByRole[userRole] ?? 'Fresh Grad · CS'
   const pageTitle = allItems.find(n => n.href === pathname)?.label ?? 'Career Arc'
+  const roleHome = groups[0]?.items[0]?.href
+  const showBack = pathname !== roleHome
 
   return (
     <div className="min-h-screen flex" style={{ background: '#e0e5ec' }}>
@@ -180,7 +183,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           {groups.map((group, gi) => (
             <div key={group.label} className={gi > 0 ? 'mt-1' : ''}>
               <div className="px-2 py-2">
-                <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: '#babecc' }}>
+                <span className="text-xs font-mono font-bold uppercase tracking-widest" style={{ color: '#7a8699' }}>
                   {group.label}
                 </span>
               </div>
@@ -238,6 +241,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           >
             <Menu className="w-5 h-5" />
           </button>
+
+          {showBack && (
+            <button
+              onClick={() => router.back()}
+              aria-label="Go back"
+              className="w-9 h-9 rounded-xl flex items-center justify-center btn-press flex-shrink-0"
+              style={{ background: '#e0e5ec', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff', color: '#4a5568' }}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
 
           <div className="flex-1 min-w-0">
             <h1 className="text-sm font-bold uppercase tracking-widest truncate" style={{ color: '#2d3436' }}>{pageTitle}</h1>
