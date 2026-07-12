@@ -4,9 +4,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { mockCompanies, mockJobs } from '@/lib/mockData'
+import { getCompanyReviews } from '@/lib/careerData'
 import {
   MapPin, Users, Star, BadgeCheck, Handshake, ShieldCheck, ArrowLeft,
-  Briefcase, ExternalLink, Clock, Sparkles
+  Briefcase, ExternalLink, Clock, Sparkles, MessageSquare, ThumbsUp, ThumbsDown
 } from 'lucide-react'
 
 const ghost: Record<string, { dot: string; rating: string; label: string }> = {
@@ -22,6 +23,8 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
 
   const roles = mockJobs.filter(j => j.company === company.name)
   const g = ghost[company.antiGhost] ?? ghost.green
+  const companyReviews = getCompanyReviews(company.id)
+  const glassdoorUrl = `https://www.glassdoor.com/Search/results.htm?keyword=${encodeURIComponent(company.name)}`
 
   return (
     <DashboardLayout>
@@ -88,6 +91,51 @@ export default function CompanyDetailPage({ params }: { params: Promise<{ id: st
               </span>
             ))}
           </div>
+        </div>
+
+        {/* Candidate reviews */}
+        <div className="card-screw rounded-2xl p-5 sm:p-6" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div className="flex items-center gap-2">
+              <MessageSquare className="w-5 h-5" style={{ color: '#8A6D1F' }} />
+              <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Candidate Reviews</h3>
+            </div>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Star key={i} className="w-4 h-4" style={{ color: '#f39c12', fill: i <= Math.round(company.rating) ? '#f39c12' : 'none' }} />
+              ))}
+              <span className="text-sm font-mono font-bold ml-1" style={{ color: '#2d3436' }}>{company.rating.toFixed(1)}</span>
+              <span className="text-xs ml-1" style={{ color: '#4a5568' }}>· {company.reviews} reviews</span>
+            </div>
+          </div>
+          <div className="flex flex-col gap-3">
+            {companyReviews.map((r, i) => (
+              <div key={i} className="rounded-xl p-4" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <div className="flex items-center gap-0.5">
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <Star key={s} className="w-3 h-3" style={{ color: '#f39c12', fill: s <= r.rating ? '#f39c12' : 'none' }} />
+                    ))}
+                  </div>
+                  <span className="text-xs font-bold" style={{ color: '#2d3436' }}>{r.role}</span>
+                  <span className="text-xs" style={{ color: '#4a5568' }}>· {r.tenure}</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs mb-1.5" style={{ color: '#2d3436' }}>
+                  <ThumbsUp className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: '#00b894' }} />
+                  <span>{r.pros}</span>
+                </div>
+                <div className="flex items-start gap-2 text-xs" style={{ color: '#4a5568' }}>
+                  <ThumbsDown className="w-3.5 h-3.5 mt-0.5 flex-shrink-0" style={{ color: '#ff4757' }} />
+                  <span>{r.cons}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+          <a href={glassdoorUrl} target="_blank" rel="noopener noreferrer"
+            className="mt-4 flex items-center justify-center gap-1.5 py-3 rounded-xl text-xs font-bold uppercase tracking-widest btn-press"
+            style={{ background: '#e0e5ec', color: '#0caa41', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+            See more on Glassdoor <ExternalLink className="w-3.5 h-3.5" />
+          </a>
         </div>
 
         {/* Open roles */}

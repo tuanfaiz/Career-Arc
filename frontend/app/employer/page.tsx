@@ -1,7 +1,10 @@
 'use client'
+import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import StatCard from '@/components/StatCard'
-import { Briefcase, Users, CheckSquare, Clock, Plus, Shield, TrendingUp } from 'lucide-react'
+import { candidates } from '@/lib/careerData'
+import { animals, type AnimalKey } from '@/lib/animalTest'
+import { Briefcase, Users, CheckSquare, Clock, Plus, Shield, TrendingUp, FileText } from 'lucide-react'
 
 const postedJobs = [
   { title: 'Senior Frontend Engineer', applicants: 47, status: 'Active', posted: '2 Jun 2025', ghost: 'green' },
@@ -10,13 +13,25 @@ const postedJobs = [
   { title: 'Backend Engineer', applicants: 17, status: 'Closed', posted: '5 Apr 2025', ghost: 'gray' },
 ]
 
-const recentApplicants = [
-  { name: 'Amirul Hakim', role: 'Senior Frontend Engineer', match: 94, status: 'Shortlisted', color: '#00b894', personality: { label: 'Lion', emoji: '🦁', color: '#e17055' } },
-  { name: 'Nur Syahirah', role: 'Senior Frontend Engineer', match: 88, status: 'Reviewed', color: '#6c5ce7', personality: { label: 'Owl', emoji: '🦉', color: '#6c5ce7' } },
-  { name: 'Fadzil Azman', role: 'Data Analyst', match: 82, status: 'Pending', color: '#fdcb6e', personality: { label: 'Wolf', emoji: '🐺', color: '#0984e3' } },
-  { name: 'Kavitha Raj', role: 'Data Analyst', match: 79, status: 'Pending', color: '#fdcb6e', personality: { label: 'Fox', emoji: '🦊', color: '#f39c12' } },
-  { name: 'Lee Wei Jian', role: 'Product Manager', match: 91, status: 'Interview', color: '#ff4757', personality: { label: 'Dolphin', emoji: '🐬', color: '#00b894' } },
+// Applicant rows derive from the SAME shared candidate pool the university reads —
+// one readiness score, three lenses.
+const applicantConfig: { id: string; role: string; status: string; color: string }[] = [
+  { id: 'c1', role: 'Senior Frontend Engineer', status: 'Shortlisted', color: '#00b894' },
+  { id: 'c9', role: 'Senior Frontend Engineer', status: 'Reviewed', color: '#6c5ce7' },
+  { id: 'c12', role: 'Data Analyst', status: 'Pending', color: '#fdcb6e' },
+  { id: 'c20', role: 'Data Analyst', status: 'Pending', color: '#fdcb6e' },
+  { id: 'c7', role: 'Product Manager', status: 'Interview', color: '#ff4757' },
 ]
+
+const recentApplicants = applicantConfig.flatMap(cfg => {
+  const c = candidates.find(x => x.id === cfg.id)
+  if (!c) return []
+  const meta = animals[c.animal as AnimalKey]
+  return [{
+    id: c.id, name: c.name, role: cfg.role, match: c.crs, status: cfg.status, color: cfg.color,
+    personality: { label: c.animal, emoji: c.animalEmoji, color: meta?.color ?? '#8A6D1F' },
+  }]
+})
 
 const responseData = [
   { week: 'W1', height: 45 }, { week: 'W2', height: 70 }, { week: 'W3', height: 35 },
@@ -113,8 +128,10 @@ export default function EmployerPage() {
             <span className="text-xs font-medium px-2.5 py-1 rounded-lg" style={{ background: '#8A6D1F18', color: '#8A6D1F' }}>🐾 YourAnimal culture-fit signal</span>
           </div>
           <div className="flex flex-col gap-3">
-            {recentApplicants.map((applicant, i) => (
-              <div key={i} className="flex items-center gap-3 px-4 py-3 rounded-xl flex-wrap sm:flex-nowrap" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
+            {recentApplicants.map(applicant => (
+              <Link key={applicant.id} href={`/employer/applicants/${applicant.id}`}
+                className="flex items-center gap-3 px-4 py-3 rounded-xl flex-wrap sm:flex-nowrap card-hover"
+                style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold font-mono flex-shrink-0" style={{ background: applicant.color }}>
                   {applicant.name.split(' ').map(n => n[0]).join('')}
                 </div>
@@ -126,9 +143,12 @@ export default function EmployerPage() {
                   style={{ background: `${applicant.personality.color}18`, color: applicant.personality.color, border: `1px solid ${applicant.personality.color}33` }}>
                   {applicant.personality.emoji} {applicant.personality.label}
                 </span>
-                <div className="text-xs font-mono font-bold px-2 py-1 rounded-lg flex-shrink-0" style={{ background: `${applicant.color}22`, color: applicant.color, border: `1px solid ${applicant.color}44` }}>{applicant.match}%</div>
+                <div className="text-xs font-mono font-bold px-2 py-1 rounded-lg flex-shrink-0" style={{ background: `${applicant.color}22`, color: applicant.color, border: `1px solid ${applicant.color}44` }} title="Career Readiness Score">CRS {applicant.match}</div>
                 <span className="px-3 py-1 rounded-full text-xs font-bold flex-shrink-0" style={{ background: `${applicant.color}22`, color: applicant.color, border: `1px solid ${applicant.color}44` }}>{applicant.status}</span>
-              </div>
+                <span className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider flex-shrink-0" style={{ color: '#4a5568' }}>
+                  <FileText className="w-3.5 h-3.5" /> Resume
+                </span>
+              </Link>
             ))}
           </div>
         </div>

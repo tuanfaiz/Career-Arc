@@ -197,6 +197,50 @@ export const jobDetails: Record<string, JobDetail> = {
   '10': { level: 'mid', workArrangement: 'Remote', scope: 'Build ML models and pipelines for enterprise clients across ASEAN.', responsibilities: ['Develop and deploy ML models', 'Build MLOps pipelines', 'Collaborate with data engineers'], niceToHave: ['MLOps', 'PyTorch'] },
 }
 
+// --- Company reviews (simulated, Glassdoor-style) ----------------------------
+
+export interface CompanyReview {
+  rating: number
+  role: string
+  tenure: string
+  pros: string
+  cons: string
+}
+
+const REVIEW_POOL: CompanyReview[] = [
+  { rating: 5, role: 'Software Engineer', tenure: '2 yrs, current employee', pros: 'Strong mentorship, real ownership from day one, and managers who actually respond to feedback.', cons: 'Sprint deadlines can get intense near quarterly releases.' },
+  { rating: 4, role: 'Fresh Graduate Hire', tenure: '1 yr, current employee', pros: 'Structured graduate programme with rotations. Salary was reviewed after 12 months as promised.', cons: 'Onboarding documentation is outdated in places.' },
+  { rating: 4, role: 'Data Analyst', tenure: '3 yrs, former employee', pros: 'Great exposure to large-scale data and cross-team projects. Good learning budget.', cons: 'Promotion cycles are slow — expect 2+ years between levels.' },
+  { rating: 3, role: 'Product Designer', tenure: '1.5 yrs, former employee', pros: 'Talented teammates and modern tooling. Flexible hours were respected.', cons: 'Design decisions sometimes overridden late in the cycle by business teams.' },
+  { rating: 5, role: 'Backend Engineer', tenure: '4 yrs, current employee', pros: 'Engineering culture takes code review and testing seriously. Clear career ladder.', cons: 'On-call rotation takes adjusting to in your first year.' },
+  { rating: 4, role: 'Intern → Full-time', tenure: '2 yrs, current employee', pros: 'Interns are treated like real engineers — I shipped to production in my first month.', cons: 'Office parking is limited; arrive early or commute by train.' },
+]
+
+// Deterministic pick of 3 reviews per company (stable across renders).
+export function getCompanyReviews(companyId: string): CompanyReview[] {
+  const seed = companyId.split('').reduce((s, ch) => s + ch.charCodeAt(0), 0)
+  const start = seed % REVIEW_POOL.length
+  return [0, 1, 2].map(i => REVIEW_POOL[(start + i * 2) % REVIEW_POOL.length])
+}
+
+// --- Employer applicant resume (generated from the shared candidate data) ----
+
+export interface ResumeExperience { title: string; org: string; period: string; description: string }
+
+export function resumeFor(c: ScoredCandidate): { email: string; summary: string; experience: ResumeExperience[] } {
+  const email = `${c.name.toLowerCase().replace(/[^a-z]+/g, '.')}@mail.com`
+  const levelLabel = levelByKey[c.level].label.toLowerCase()
+  const summary = `${c.programme} ${c.level === 'internship' ? 'undergraduate' : 'graduate'} (${c.university}) seeking a ${levelLabel === 'internship student' ? 'software internship' : `${levelLabel} role`}. Core strengths: ${c.skills.slice(0, 3).join(', ')}. ${c.animalEmoji} ${c.animal} work style — ${c.animal === 'Lion' ? 'ships fast and takes ownership' : c.animal === 'Owl' ? 'deep analytical problem-solver' : c.animal === 'Dolphin' ? 'collaborative team connector' : c.animal === 'Fox' ? 'creative and adaptable' : 'reliable and detail-driven'}.`
+  const primary = c.skills[0] ?? 'software'
+  const experience: ResumeExperience[] = c.level === 'internship'
+    ? [{ title: 'Student Project — Capstone', org: c.university, period: '2025', description: `Built a ${primary}-based project as part of coursework; presented to faculty panel.` }]
+    : [
+      { title: c.level === 'senior' ? `Senior ${c.programme.includes('Data') ? 'Data' : 'Software'} Engineer` : c.level === 'mid' ? `${c.programme.includes('Data') ? 'Data Analyst' : 'Software Engineer'}` : `${c.programme.includes('Design') ? 'Design' : 'Engineering'} Intern`, org: 'TechCorp Malaysia', period: c.level === 'senior' ? '2021 – Present' : c.level === 'mid' ? '2023 – Present' : 'Jan – Jun 2025', description: `Worked with ${c.skills.slice(0, 3).join(', ')} on production systems; contributed to team delivery across ${c.applications > 5 ? 'multiple' : 'several'} releases.` },
+      { title: 'Freelance / Personal Projects', org: 'Self-directed', period: '2023 – Present', description: `Built and shipped side projects using ${c.skills.slice(-2).join(' and ')}; documented work in a public portfolio.` },
+    ]
+  return { email, summary, experience }
+}
+
 // --- Simulated AI text -------------------------------------------------------
 
 const TARGET = 90

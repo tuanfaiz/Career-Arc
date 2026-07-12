@@ -2,9 +2,27 @@
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
 import { careerPathData } from '@/lib/mockData'
-import { TrendingUp, ArrowRight, CheckCircle } from 'lucide-react'
+import { TrendingUp, ArrowRight, CheckCircle, Sparkles } from 'lucide-react'
 
 type PathKey = 'A' | 'B' | 'C'
+
+const pathInsights: Record<PathKey, { headline: string; sub: string; cta: string }> = {
+  A: {
+    headline: 'Add System Design + AWS → +40% salary potential by Year 8',
+    sub: 'Tech-track promotions in Malaysia hinge on architecture ownership. Based on 847 similar profiles, engineers who close these two gaps reach Tech Lead 2.3 years faster.',
+    cta: 'View Learning Path',
+  },
+  B: {
+    headline: 'Add Product Thinking + Data Analytics → −18% dip now, +32% above tech track by Year 12',
+    sub: 'PM pivots take a short-term salary cut at Associate PM, then out-earn the pure tech track long-term. Based on 412 engineer-to-PM pivots, stakeholder management is the #1 differentiator.',
+    cta: 'View PM Transition Plan',
+  },
+  C: {
+    headline: 'Build Client Management + Personal Branding first — survive the founder dip 3× more often',
+    sub: 'Founders who start with 2+ freelance retainer clients keep income above RM 8K during the startup dip. Based on 156 founder paths, financial runway — not the idea — is the top failure cause.',
+    cta: 'View Founder Roadmap',
+  },
+}
 
 const currentSkills = ['React', 'Node.js', 'Python', 'SQL', 'TypeScript', 'Git']
 const skillsNeeded: Record<PathKey, Array<{ name: string; current: number; needed: number }>> = {
@@ -161,16 +179,18 @@ export default function CareerPathPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4"
-          style={{ background: '#ff4757', boxShadow: '8px 8px 16px rgba(255,71,87,0.3)' }}>
+        <div className="rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between gap-4 transition-all duration-300"
+          style={{ background: path.color, boxShadow: `8px 8px 16px ${path.color}44` }}>
           <div>
-            <p className="text-sm font-bold text-white opacity-80 uppercase tracking-widest mb-1">AI Insight</p>
-            <p className="text-lg font-bold text-white">Add Next.js Advanced + AWS → <span className="font-mono">+40%</span> salary potential</p>
-            <p className="text-sm text-white opacity-70 mt-1">Based on 847 similar profiles in Malaysia</p>
+            <p className="text-sm font-bold text-white opacity-80 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> AI Insight · Path {selectedPath}
+            </p>
+            <p className="text-lg font-bold text-white">{pathInsights[selectedPath].headline}</p>
+            <p className="text-sm text-white opacity-70 mt-1">{pathInsights[selectedPath].sub}</p>
           </div>
           <button className="px-6 py-3 rounded-xl text-xs font-bold uppercase tracking-widest btn-press flex-shrink-0"
             style={{ background: 'rgba(255,255,255,0.2)', color: 'white', border: '1px solid rgba(255,255,255,0.3)' }}>
-            View Learning Path
+            {pathInsights[selectedPath].cta}
           </button>
         </div>
       </div>

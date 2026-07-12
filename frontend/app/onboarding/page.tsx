@@ -3,12 +3,14 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { levels, levelByKey, SKILL_POOL, defaultProfile, type StepKey } from '@/lib/careerData'
 import { computeCrs, riskOf, riskMeta, type Level, type CrsBreakdown } from '@/lib/scoring'
+import { animals, type AnimalKey } from '@/lib/animalTest'
+import AnimalQuiz from '@/components/AnimalQuiz'
 import {
   Target, ChevronRight, ChevronLeft, Check, Upload, FileText, Plus, Sparkles, PawPrint, Rocket,
 } from 'lucide-react'
 
 const SAMPLE_PROJECTS = ['Lokal-Map App (Hackathon)', 'SurveyLuhh Platform (Freelance)', 'Internal Dashboard (Internship)']
-const ANIMALS: [string, string][] = [['Lion', '🦁'], ['Owl', '🦉'], ['Dolphin', '🐬'], ['Fox', '🦊'], ['Wolf', '🐺']]
+const ANIMALS: [string, string][] = (Object.entries(animals) as [AnimalKey, typeof animals.Lion][]).map(([name, a]) => [name, a.emoji])
 const STEP_TITLES: Record<StepKey, string> = {
   level: 'Level', profile: 'Profile', resume: 'Resume', skills: 'Skills',
   portfolio: 'Portfolio', animal: 'YourAnimal', preference: 'Preferences', interview: 'Interview',
@@ -45,6 +47,7 @@ function derive(d: Data): CrsBreakdown {
 export default function OnboardingPage() {
   const router = useRouter()
   const [stepIdx, setStepIdx] = useState(0)
+  const [quizMode, setQuizMode] = useState(false)
   const [d, setD] = useState<Data>({
     level: null, name: defaultProfile.name, programme: defaultProfile.programme,
     profileDone: false, resumeReady: false, skills: [], portfolioItems: 0,
@@ -234,9 +237,43 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {current === 'animal' && (
+            {current === 'animal' && quizMode && (
               <div className="space-y-5">
-                <StepHead icon={PawPrint} title="YourAnimal" sub="Pick your work animal (or take the full 40-question test later)." />
+                <div className="flex items-center justify-between">
+                  <StepHead icon={PawPrint} title="YourAnimal Test" sub="The official 40-question assessment." />
+                  <button onClick={() => setQuizMode(false)} className="text-xs font-bold uppercase tracking-widest flex-shrink-0" style={{ color: '#4a5568' }}>Exit test</button>
+                </div>
+                <AnimalQuiz onComplete={(animal) => { set('animal', animal); setQuizMode(false) }} />
+              </div>
+            )}
+
+            {current === 'animal' && !quizMode && (
+              <div className="space-y-5">
+                <StepHead icon={PawPrint} title="YourAnimal" sub="Take the official Talentbank assessment — or quick-pick and skip for now." />
+
+                {d.animal ? (
+                  <div className="rounded-2xl p-5 flex items-center gap-4" style={{ background: animals[d.animal as AnimalKey]?.bg ?? '#f0f2f5', border: `1px solid ${animals[d.animal as AnimalKey]?.color ?? '#8A6D1F'}33`, boxShadow: '6px 6px 12px #babecc, -6px -6px 12px #ffffff' }}>
+                    <span className="text-4xl">{animals[d.animal as AnimalKey]?.emoji}</span>
+                    <div className="flex-1">
+                      <div className="text-xs font-bold uppercase tracking-widest" style={{ color: animals[d.animal as AnimalKey]?.color ?? '#8A6D1F' }}>Your Work Animal</div>
+                      <div className="font-black" style={{ color: '#2d3436' }}>{animals[d.animal as AnimalKey]?.title ?? d.animal}</div>
+                    </div>
+                    <button onClick={() => { set('animal', null); setQuizMode(true) }} className="px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider btn-press flex-shrink-0" style={{ background: '#e0e5ec', color: '#4a5568', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>Retake</button>
+                  </div>
+                ) : (
+                  <button onClick={() => setQuizMode(true)}
+                    className="w-full py-4 rounded-2xl font-bold text-sm uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2"
+                    style={{ background: '#8A6D1F', boxShadow: '6px 6px 14px rgba(138,109,31,0.35)' }}>
+                    <PawPrint className="w-4 h-4" /> Take the full 40-question test
+                  </button>
+                )}
+
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
+                  <span className="text-xs uppercase tracking-widest" style={{ color: '#4a5568' }}>or quick-pick your animal</span>
+                  <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
+                </div>
+
                 <div className="grid grid-cols-5 gap-2">
                   {ANIMALS.map(([name, emoji]) => (
                     <button key={name} onClick={() => set('animal', name)} className="flex flex-col items-center gap-1.5 p-3 rounded-xl btn-press"
@@ -246,6 +283,7 @@ export default function OnboardingPage() {
                     </button>
                   ))}
                 </div>
+                <p className="text-xs" style={{ color: '#4a5568' }}>This step is optional — you can continue without picking and take the test later.</p>
               </div>
             )}
 
@@ -289,7 +327,7 @@ export default function OnboardingPage() {
           </div>
 
           {/* Nav */}
-          <div className="flex gap-3">
+          <div className="flex gap-3" style={{ display: current === 'animal' && quizMode ? 'none' : undefined }}>
             {stepIdx > 0 && (
               <button onClick={back} className="px-5 py-3.5 rounded-xl font-bold text-sm uppercase tracking-widest btn-press flex items-center gap-2" style={{ background: '#e0e5ec', color: '#4a5568', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
                 <ChevronLeft className="w-4 h-4" /> Back
