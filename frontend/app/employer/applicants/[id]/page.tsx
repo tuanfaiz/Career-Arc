@@ -1,13 +1,14 @@
 'use client'
-import { use, useState } from 'react'
+import { use, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
 import { candidates, resumeFor, levelByKey } from '@/lib/careerData'
 import { animals, type AnimalKey } from '@/lib/animalTest'
 import { riskMeta, CRS_LABELS, type CrsBreakdown } from '@/lib/scoring'
+import { STORY_PROMPTS, getSessionBlobUrl, formatClock } from '@/lib/storyVideo'
 import {
-  ArrowLeft, Mail, GraduationCap, CheckSquare, CalendarClock, Download, Check,
+  ArrowLeft, Mail, GraduationCap, CheckSquare, CalendarClock, Download, Check, Video, Play,
 } from 'lucide-react'
 
 export default function ApplicantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -17,6 +18,13 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
 
   const [action, setAction] = useState<string | null>(null)
   const [downloaded, setDownloaded] = useState(false)
+  const [storyUrl, setStoryUrl] = useState<string | null>(null)
+
+  // If the candidate recorded a Story Video in this session, the employer can
+  // actually watch it back. Otherwise fall back to the placeholder player.
+  useEffect(() => {
+    if (id === 'c1') setStoryUrl(getSessionBlobUrl())
+  }, [id])
 
   const rm = riskMeta[c.risk]
   const animal = animals[c.animal as AnimalKey]
@@ -47,6 +55,52 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
             <div className="text-center flex-shrink-0">
               <div className="text-4xl font-black font-mono" style={{ color: rm.color }}>{c.crs}</div>
               <div className="text-xs uppercase tracking-widest mt-0.5" style={{ color: '#4a5568' }}>Readiness</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Story Video — what a resume can't show */}
+        <div className="card-screw rounded-2xl p-5 sm:p-6" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Video className="w-5 h-5" style={{ color: '#ff4757' }} />
+            <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Story Video</h3>
+            <span className="ml-auto text-xs font-mono" style={{ color: '#4a5568' }}>{formatClock(58)}</span>
+          </div>
+          <p className="text-sm mb-4" style={{ color: '#4a5568' }}>What a resume can&apos;t show — {c.name.split(' ')[0]} in their own words.</p>
+
+          <div className="grid sm:grid-cols-[1.4fr_1fr] gap-4">
+            {/* Player */}
+            <div className="relative rounded-xl overflow-hidden flex items-center justify-center"
+              style={{ background: 'linear-gradient(135deg, #dfe4ec 0%, #cfd6e2 100%)', boxShadow: 'inset 4px 4px 10px #babecc, inset -4px -4px 10px #ffffff', aspectRatio: '16 / 10' }}>
+              {storyUrl ? (
+                <video src={storyUrl} controls playsInline className="absolute inset-0 w-full h-full object-cover" />
+              ) : (
+                <>
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center text-xl font-black"
+                    style={{ background: '#f5c9a6', color: '#2d3436', boxShadow: '4px 4px 10px rgba(0,0,0,0.12)' }}>
+                    {c.initials}
+                  </div>
+                  <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: '#ffffff', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}>
+                      <Play className="w-3.5 h-3.5 fill-current" style={{ color: '#ff4757' }} />
+                      <span className="text-xs font-bold" style={{ color: '#2d3436' }}>Play story</span>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Chapters */}
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#4a5568' }}>What they cover</div>
+              <div className="flex flex-col gap-1.5">
+                {STORY_PROMPTS.map(p => (
+                  <div key={p.n} className="flex items-center gap-2.5 px-3 py-2 rounded-lg" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
+                    <span className="text-xs font-mono font-bold flex-shrink-0" style={{ color: '#ff4757' }}>{formatClock(p.startSec)}</span>
+                    <span className="text-xs font-medium truncate" style={{ color: '#2d3436' }}>{p.title}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>

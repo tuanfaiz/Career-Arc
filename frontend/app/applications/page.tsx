@@ -4,7 +4,7 @@ import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { mockJobs, mockApplications } from '@/lib/mockData'
 import { readMyApplications } from '@/lib/applications'
-import { Send, Check, Search, ArrowRight } from 'lucide-react'
+import { Send, Check, Search, ArrowRight, Video } from 'lucide-react'
 
 const STAGES = ['Applied', 'Under Review', 'Interview', 'Offer']
 
@@ -22,6 +22,7 @@ interface Row {
   nextStep: string
   antiGhost: string
   antiGhostLabel: string
+  withVideo?: boolean
 }
 
 // Map seeded mock statuses onto the 4-stage pipeline.
@@ -49,6 +50,7 @@ export default function ApplicationsPage() {
         stage: 0, stalled: false, statusLabel: 'Submitted',
         nextStep: 'Awaiting HR screening — most employers here respond within a week.',
         antiGhost: job.antiGhost, antiGhostLabel: job.antiGhostLabel,
+        withVideo: a.withVideo,
       }]
     })
     setMine(rows.reverse()) // newest first
@@ -97,6 +99,11 @@ export default function ApplicationsPage() {
                       <div className="flex items-center gap-2 flex-wrap">
                         <h3 className="font-bold" style={{ color: '#2d3436' }}>{r.jobTitle}</h3>
                         <span className="px-2.5 py-0.5 rounded-lg text-xs font-bold" style={{ background: `${activeColor}18`, color: activeColor }}>{r.statusLabel}</span>
+                        {r.withVideo && (
+                          <span className="flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-xs font-bold" style={{ background: '#ff475718', color: '#ff4757' }}>
+                            <Video className="w-3 h-3" /> Story video
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 mt-0.5 text-xs font-mono flex-wrap" style={{ color: '#4a5568' }}>
                         <span>{r.company}</span>

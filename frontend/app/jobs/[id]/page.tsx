@@ -9,9 +9,10 @@ import {
   compatibility, verdictOf, verdictMeta, type Level,
 } from '@/lib/scoring'
 import { readMyApplications, addApplication } from '@/lib/applications'
+import { hasStoryVideo } from '@/lib/storyVideo'
 import {
   ArrowLeft, MapPin, Briefcase, Sparkles, Check, X, ExternalLink, BadgeCheck,
-  TrendingUp, Wifi, DollarSign, Send,
+  TrendingUp, Wifi, DollarSign, Send, Video,
 } from 'lucide-react'
 
 export default function JobDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -24,6 +25,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
   const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
   const [level, setLevel] = useState<Level>(defaultProfile.level)
   const [applied, setApplied] = useState(false)
+  const [videoAvailable, setVideoAvailable] = useState(false)
+  const [attachVideo, setAttachVideo] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -32,10 +35,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
       if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills); if (p.level) setLevel(p.level) }
     } catch { /* keep defaults */ }
     setApplied(readMyApplications().some(a => a.jobId === id))
+    const has = hasStoryVideo()
+    setVideoAvailable(has)
+    setAttachVideo(has)
   }, [id])
 
   function handleApply() {
-    addApplication(id)
+    addApplication(id, attachVideo && videoAvailable)
     setApplied(true)
   }
 
@@ -175,9 +181,33 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             </Link>
           </div>
         ) : (
-          <button onClick={handleApply} className="w-full py-4 rounded-2xl text-sm font-bold uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2" style={{ background: '#ff4757', boxShadow: '6px 6px 14px rgba(255,71,87,0.35)' }}>
-            <Send className="w-4 h-4" /> Apply now
-          </button>
+          <div className="space-y-3">
+            {/* Attach Story Video */}
+            {videoAvailable ? (
+              <button onClick={() => setAttachVideo(v => !v)}
+                className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl btn-press transition-all"
+                style={{ background: '#e0e5ec', boxShadow: attachVideo ? 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff, 0 0 0 2px #00b894' : '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+                <Video className="w-4 h-4 flex-shrink-0" style={{ color: attachVideo ? '#00b894' : '#4a5568' }} />
+                <span className="flex-1 text-left text-sm font-bold" style={{ color: attachVideo ? '#00b894' : '#4a5568' }}>
+                  Attach my 60-second Story Video
+                </span>
+                <span className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: attachVideo ? '#00b894' : '#babecc' }}>
+                  {attachVideo && <Check className="w-3 h-3 text-white" />}
+                </span>
+              </button>
+            ) : (
+              <Link href="/story-video" className="w-full flex items-center gap-3 px-5 py-3.5 rounded-2xl btn-press" style={{ background: '#e0e5ec', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
+                <Video className="w-4 h-4 flex-shrink-0" style={{ color: '#4a5568' }} />
+                <span className="flex-1 text-left text-sm font-medium" style={{ color: '#4a5568' }}>
+                  No Story Video yet — <span className="font-bold" style={{ color: '#ff4757' }}>record one</span> to stand out
+                </span>
+              </Link>
+            )}
+
+            <button onClick={handleApply} className="w-full py-4 rounded-2xl text-sm font-bold uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2" style={{ background: '#ff4757', boxShadow: '6px 6px 14px rgba(255,71,87,0.35)' }}>
+              <Send className="w-4 h-4" /> Apply now
+            </button>
+          </div>
         )}
       </div>
     </DashboardLayout>
