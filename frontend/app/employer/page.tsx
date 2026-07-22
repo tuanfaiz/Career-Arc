@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import StatCard from '@/components/StatCard'
-import { candidates } from '@/lib/careerData'
+import { candidates, applicantRoles } from '@/lib/careerData'
 import { animals, type AnimalKey } from '@/lib/animalTest'
 import { Briefcase, Users, CheckSquare, Clock, Plus, Shield, TrendingUp, FileText } from 'lucide-react'
 
@@ -14,16 +14,9 @@ const postedJobs = [
 ]
 
 // Applicant rows derive from the SAME shared candidate pool the university reads —
-// one readiness score, three lenses.
-const applicantConfig: { id: string; role: string; status: string; color: string }[] = [
-  { id: 'c1', role: 'Senior Frontend Engineer', status: 'Shortlisted', color: '#00b894' },
-  { id: 'c9', role: 'Senior Frontend Engineer', status: 'Reviewed', color: '#6c5ce7' },
-  { id: 'c12', role: 'Data Analyst', status: 'Pending', color: '#fdcb6e' },
-  { id: 'c20', role: 'Data Analyst', status: 'Pending', color: '#fdcb6e' },
-  { id: 'c7', role: 'Product Manager', status: 'Interview', color: '#ff4757' },
-]
-
-const recentApplicants = applicantConfig.flatMap(cfg => {
+// one readiness score, three lenses. applicantRoles also carries the job each
+// person applied for, so the detail page can compute a Match Score against it.
+const recentApplicants = applicantRoles.flatMap(cfg => {
   const c = candidates.find(x => x.id === cfg.id)
   if (!c) return []
   const meta = animals[c.animal as AnimalKey]

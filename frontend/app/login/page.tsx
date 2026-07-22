@@ -1,67 +1,33 @@
 'use client'
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Target, Eye, EyeOff, AlertCircle, Zap, GraduationCap, Building2, School, Landmark } from 'lucide-react'
+import { Target, Zap, GraduationCap, Building2, School, Landmark, ArrowRight } from 'lucide-react'
 
 type Role = 'candidate' | 'employer' | 'university' | 'ministry'
 
-const demoAccounts: Record<Role, { email: string; password: string; name: string; route: string; label: string }> = {
-  candidate: { email: 'demo@careerarc.my', password: 'demo123', name: 'Amirul Hakim', route: '/dashboard', label: 'Candidate' },
-  employer: { email: 'employer@careerarc.my', password: 'demo123', name: 'Syarikat TechCorp', route: '/employer', label: 'Employer' },
-  university: { email: 'university@careerarc.my', password: 'demo123', name: 'UPM Career Services', route: '/university', label: 'University' },
-  ministry: { email: 'ministry@careerarc.my', password: 'demo123', name: 'MOHE Planning Unit', route: '/ministry', label: 'Ministry' },
-}
+const roles: { r: Role; icon: React.ElementType; label: string; sub: string; name: string; route: string }[] = [
+  { r: 'candidate', icon: GraduationCap, label: 'Candidate', sub: 'Job seeker', name: 'Amirul Hakim', route: '/dashboard' },
+  { r: 'employer', icon: Building2, label: 'Employer', sub: 'Hiring manager', name: 'Syarikat TechCorp', route: '/employer' },
+  { r: 'university', icon: School, label: 'University', sub: 'Career services', name: 'UPM Career Services', route: '/university' },
+  { r: 'ministry', icon: Landmark, label: 'Ministry', sub: 'Policy & planning', name: 'MOHE Planning Unit', route: '/ministry' },
+]
 
 export default function LoginPage() {
-  const [role, setRole] = useState<Role>('candidate')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [error, setError] = useState('')
-  const [loading, setLoading] = useState(false)
   const router = useRouter()
 
-  function selectRole(r: Role) {
-    setRole(r)
-    setEmail('')
-    setPassword('')
-    setError('')
-  }
-
-  function quickLogin(r: Role) {
-    const acc = demoAccounts[r]
+  function enter(role: typeof roles[number]) {
     localStorage.setItem('isLoggedIn', 'true')
-    localStorage.setItem('userRole', r)
-    localStorage.setItem('userName', acc.name)
-    if (r === 'candidate') {
+    localStorage.setItem('userRole', role.r)
+    localStorage.setItem('userName', role.name)
+    if (role.r === 'candidate') {
+      // Candidates start at onboarding so the readiness score builds live.
       localStorage.removeItem('onboardingComplete')
       localStorage.removeItem('careerProfile')
       router.push('/onboarding')
     } else {
-      router.push(acc.route)
+      router.push(role.route)
     }
   }
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-    await new Promise(r => setTimeout(r, 800))
-
-    const acc = demoAccounts[role]
-    if (email === acc.email && password === acc.password) {
-      localStorage.setItem('isLoggedIn', 'true')
-      localStorage.setItem('userRole', role)
-      localStorage.setItem('userName', acc.name)
-      router.push(acc.route)
-    } else {
-      setError(`Invalid credentials. Try: ${acc.email} / demo123`)
-      setLoading(false)
-    }
-  }
-
-  const roleLabel = demoAccounts[role].label
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-8" style={{ background: '#e0e5ec' }}>
@@ -79,109 +45,26 @@ export default function LoginPage() {
             <p className="text-sm mt-1" style={{ color: '#4a5568' }}>Career clarity for Gen Z Malaysia</p>
           </div>
 
-          {/* One-click demo access (for judges) */}
-          <div className="mb-6">
-            <p className="text-xs font-mono font-bold uppercase tracking-widest mb-3 text-center flex items-center justify-center gap-1.5" style={{ color: '#ff4757' }}>
-              <Zap size={12} /> One-click demo access
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              {([
-                { r: 'candidate' as Role, icon: GraduationCap, label: 'Candidate' },
-                { r: 'employer' as Role, icon: Building2, label: 'Employer' },
-                { r: 'university' as Role, icon: School, label: 'University' },
-                { r: 'ministry' as Role, icon: Landmark, label: 'Ministry' },
-              ]).map(({ r, icon: Icon, label }) => (
-                <button key={r} onClick={() => quickLogin(r)}
-                  className="flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-sm font-bold btn-press transition-all"
-                  style={{ background: '#ff4757', color: '#ffffff', boxShadow: '4px 4px 10px rgba(255,71,87,0.3)' }}>
-                  <Icon className="w-4 h-4" /> {label}
-                </button>
-              ))}
-            </div>
-            <p className="text-xs text-center mt-2" style={{ color: '#4a5568' }}>Enter instantly — no password needed.</p>
+          {/* One-click entry — the only way in */}
+          <p className="text-xs font-mono font-bold uppercase tracking-widest mb-4 text-center flex items-center justify-center gap-1.5" style={{ color: '#ff4757' }}>
+            <Zap size={12} /> Choose a view to enter
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+            {roles.map(role => (
+              <button key={role.r} onClick={() => enter(role)}
+                className="group flex flex-col items-center gap-1.5 py-5 px-3 rounded-2xl btn-press transition-all"
+                style={{ background: '#ff4757', color: '#ffffff', boxShadow: '6px 6px 14px rgba(255,71,87,0.3)' }}>
+                <role.icon className="w-6 h-6" />
+                <span className="text-sm font-bold">{role.label}</span>
+                <span className="text-xs opacity-80">{role.sub}</span>
+              </button>
+            ))}
           </div>
 
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
-            <span className="text-xs uppercase tracking-widest" style={{ color: '#4a5568' }}>or sign in manually</span>
-            <div className="flex-1 h-px" style={{ background: '#d1d9e6' }} />
-          </div>
-
-          {/* Role selector */}
-          <div className="mb-6">
-            <p className="text-xs font-mono font-bold uppercase tracking-widest mb-3 text-center" style={{ color: '#4a5568' }}>I am a...</p>
-            <div className="grid grid-cols-2 gap-3 p-1.5 rounded-2xl" style={{ background: '#e0e5ec', boxShadow: 'inset 4px 4px 8px #babecc, inset -4px -4px 8px #ffffff' }}>
-              {([
-                { r: 'candidate' as Role, icon: GraduationCap, label: 'Candidate', sub: 'Job seeker' },
-                { r: 'employer' as Role, icon: Building2, label: 'Employer', sub: 'Hiring manager' },
-                { r: 'university' as Role, icon: School, label: 'University', sub: 'Career services' },
-                { r: 'ministry' as Role, icon: Landmark, label: 'Ministry', sub: 'Policy & planning' },
-              ]).map(({ r, icon: Icon, label, sub }) => (
-                <button
-                  key={r}
-                  onClick={() => selectRole(r)}
-                  className="flex flex-col items-center gap-1.5 py-4 px-3 rounded-xl transition-all duration-200 btn-press"
-                  style={{
-                    background: role === r ? '#ff4757' : '#e0e5ec',
-                    boxShadow: role === r
-                      ? '4px 4px 10px rgba(255,71,87,0.35), -2px -2px 6px rgba(255,255,255,0.5)'
-                      : '4px 4px 8px #babecc, -4px -4px 8px #ffffff',
-                    color: role === r ? '#ffffff' : '#4a5568',
-                  }}
-                >
-                  <Icon className="w-5 h-5" />
-                  <span className="text-sm font-bold">{label}</span>
-                  <span className="text-xs opacity-80">{sub}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div>
-              <label className="block text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#4a5568' }}>Email Address</label>
-              <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)}
-                placeholder={demoAccounts[role].email}
-                className="input-recessed w-full px-4 py-3 rounded-xl text-sm font-mono"
-                style={{ color: '#2d3436' }} required
-              />
-            </div>
-            <div>
-              <label className="block text-xs uppercase tracking-widest font-medium mb-2" style={{ color: '#4a5568' }}>Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
-                  placeholder="demo123"
-                  className="input-recessed w-full px-4 py-3 rounded-xl text-sm font-mono pr-12"
-                  style={{ color: '#2d3436' }} required
-                />
-                <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2" style={{ color: '#4a5568' }}>
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            {error && (
-              <div className="flex items-center gap-2 px-4 py-3 rounded-xl" style={{ background: '#fff0f1', border: '1px solid #ff4757' }}>
-                <AlertCircle size={16} style={{ color: '#ff4757', flexShrink: 0 }} />
-                <span className="text-xs" style={{ color: '#ff4757' }}>{error}</span>
-              </div>
-            )}
-
-            <button type="submit" disabled={loading}
-              className="w-full py-4 rounded-xl text-sm font-bold uppercase tracking-widest text-white btn-press transition-all mt-1"
-              style={{ background: '#ff4757', boxShadow: '6px 6px 12px rgba(255,71,87,0.3)', opacity: loading ? 0.8 : 1 }}>
-              {loading ? 'Signing in...' : `Login as ${roleLabel}`}
-            </button>
-          </form>
-
-          <div className="mt-5 p-4 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
-            <p className="text-xs text-center font-mono" style={{ color: '#4a5568' }}>
-              Demo: <span style={{ color: '#ff4757' }}>{demoAccounts[role].email}</span> / <span style={{ color: '#2d3436' }}>demo123</span>
-            </p>
-          </div>
+          <p className="text-xs text-center mt-4 flex items-center justify-center gap-1" style={{ color: '#4a5568' }}>
+            No password needed <ArrowRight size={11} /> you land straight in
+          </p>
         </div>
 
         <div className="text-center mt-6">

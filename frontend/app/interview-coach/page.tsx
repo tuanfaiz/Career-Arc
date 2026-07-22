@@ -157,8 +157,14 @@ export default function CareerCoachPage() {
               <MessageSquare className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl sm:text-2xl font-black" style={{ color: '#2d3436' }}>AI Career Coach</h2>
-              <p className="text-sm mt-1" style={{ color: '#4a5568' }}>Practice real interview questions tailored to your role, company type, and seniority. All with model answers.</p>
+              <h2 className="text-xl sm:text-2xl font-black" style={{ color: '#2d3436' }}>
+                SIFU <span style={{ color: '#4a5568', fontWeight: 500 }}>— your interview coach</span>
+              </h2>
+              <p className="text-sm mt-1" style={{ color: '#4a5568' }}>
+                <strong style={{ color: '#2d3436' }}>S</strong>mart <strong style={{ color: '#2d3436' }}>I</strong>nterview{' '}
+                <strong style={{ color: '#2d3436' }}>F</strong>eedback &amp; <strong style={{ color: '#2d3436' }}>U</strong>pskilling.
+                Practice real questions tailored to your role, company type and seniority — every one with a model answer.
+              </p>
             </div>
           </div>
         </div>

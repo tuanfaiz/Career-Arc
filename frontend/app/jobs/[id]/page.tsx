@@ -6,7 +6,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import { mockJobs, mockCompanies } from '@/lib/mockData'
 import { jobDetails, defaultProfile, levelByKey, jobVerdictText, type JobDetail } from '@/lib/careerData'
 import {
-  compatibility, verdictOf, verdictMeta, type Level,
+  matchScore, verdictOf, verdictMeta, type Level,
 } from '@/lib/scoring'
 import { readMyApplications, addApplication } from '@/lib/applications'
 import { hasStoryVideo } from '@/lib/storyVideo'
@@ -24,6 +24,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
 
   const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
   const [level, setLevel] = useState<Level>(defaultProfile.level)
+  const [programme, setProgramme] = useState<string>(defaultProfile.programme)
+  const [prefRole, setPrefRole] = useState<string | null>(null)
   const [applied, setApplied] = useState(false)
   const [videoAvailable, setVideoAvailable] = useState(false)
   const [attachVideo, setAttachVideo] = useState(false)
@@ -32,7 +34,13 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     if (typeof window === 'undefined') return
     try {
       const raw = localStorage.getItem('careerProfile')
-      if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills); if (p.level) setLevel(p.level) }
+      if (raw) {
+        const p = JSON.parse(raw)
+        if (p.skills) setSkills(p.skills)
+        if (p.level) setLevel(p.level)
+        if (p.programme) setProgramme(p.programme)
+        if (p.prefRole) setPrefRole(p.prefRole)
+      }
     } catch { /* keep defaults */ }
     setApplied(readMyApplications().some(a => a.jobId === id))
     const has = hasStoryVideo()
@@ -45,11 +53,17 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
     setApplied(true)
   }
 
-  const allSkills = [...job.skills, ...(detail?.niceToHave ?? [])]
-  const comp = compatibility(skills, allSkills)
-  const verdict = verdictOf(comp.score)
-  const vm = verdictMeta[verdict]
   const jobLevel = detail?.level ?? 'fresh'
+  const match = matchScore(
+    { skills, level, programme, prefRole },
+    {
+      title: job.title, skills: job.skills, level: jobLevel, industry: job.industry,
+      responsibilities: detail?.responsibilities, niceToHave: detail?.niceToHave,
+      education: detail?.education, roleFamily: detail?.roleFamily,
+    },
+  )
+  const verdict = verdictOf(match.score)
+  const vm = verdictMeta[verdict]
   const levelMatch = jobLevel === level
 
   const ghostColor = job.antiGhost === 'green' ? '#00b894' : job.antiGhost === 'yellow' ? '#fdcb6e' : '#ff4757'
@@ -82,19 +96,36 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
           </div>
         </div>
 
-        {/* Compatibility analysis */}
+        {/* Match Score — 6 weighted dimensions */}
         <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-          <h3 className="font-bold uppercase tracking-widest text-sm mb-6" style={{ color: '#2d3436' }}>Your compatibility</h3>
+          <h3 className="font-bold uppercase tracking-widest text-sm mb-1" style={{ color: '#2d3436' }}>Your match for this role</h3>
+          <p className="text-xs mb-6" style={{ color: '#4a5568' }}>Six weighted factors — not just a skills tick-list.</p>
+
           <div className="flex flex-col sm:flex-row items-center gap-6 mb-6">
-            <Ring value={comp.score} color={vm.color} />
-            <div className="flex-1 w-full">
-              {/* You vs job */}
-              <div className="space-y-2.5">
-                <CompareRow label="Skills matched" ok={`${comp.have.length}/${allSkills.length}`} good={comp.have.length >= allSkills.length * 0.7} />
-                <CompareRow label="Experience level" ok={levelMatch ? 'Match' : `${levelByKey[level].label} vs ${levelByKey[jobLevel].label}`} good={levelMatch} />
-                <CompareRow label="Salary vs your range" ok={job.salary} good={true} />
-              </div>
+            <Ring value={match.score} color={vm.color} />
+            <div className="flex-1 w-full space-y-3">
+              {match.dimensions.map(d => (
+                <div key={d.key}>
+                  <div className="flex items-baseline justify-between gap-2 mb-1 flex-wrap">
+                    <span className="text-xs font-bold" style={{ color: '#2d3436' }}>
+                      {d.label}
+                      <span className="ml-1.5 font-mono font-normal" style={{ color: '#7a8699' }}>{Math.round(d.weight * 100)}%</span>
+                    </span>
+                    <span className="text-xs font-mono font-bold" style={{ color: d.score >= 70 ? '#00b894' : d.score >= 45 ? '#f39c12' : '#ff4757' }}>{d.score}</span>
+                  </div>
+                  <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#e0e5ec', boxShadow: 'inset 1px 1px 2px #babecc, inset -1px -1px 2px #ffffff' }}>
+                    <div className="h-full rounded-full transition-all duration-500" style={{ width: `${d.score}%`, background: d.score >= 70 ? '#00b894' : d.score >= 45 ? '#f39c12' : '#ff4757' }} />
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: '#7a8699' }}>{d.detail}</div>
+                </div>
+              ))}
             </div>
+          </div>
+
+          {/* Level / salary quick compare */}
+          <div className="grid sm:grid-cols-2 gap-2.5 mb-4">
+            <CompareRow label="Experience level" ok={levelMatch ? 'Match' : `${levelByKey[level].label} vs ${levelByKey[jobLevel].label}`} good={levelMatch} />
+            <CompareRow label="Salary range" ok={job.salary} good={true} />
           </div>
 
           {/* Skills breakdown */}
@@ -102,7 +133,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             <div className="rounded-xl p-4" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
               <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#00b894' }}>You have</div>
               <div className="flex flex-wrap gap-1.5">
-                {comp.have.length ? comp.have.map(s => (
+                {match.matchedSkills.length ? match.matchedSkills.map(s => (
                   <span key={s} className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: '#00b89418', color: '#00b894' }}><Check className="w-3 h-3" />{s}</span>
                 )) : <span className="text-xs" style={{ color: '#4a5568' }}>—</span>}
               </div>
@@ -110,8 +141,8 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
             <div className="rounded-xl p-4" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
               <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#ff4757' }}>Missing — close these</div>
               <div className="flex flex-wrap gap-1.5">
-                {comp.missing.length ? comp.missing.map(s => (
-                  <span key={s} className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: '#ff475718', color: '#ff4757' }}><X className="w-3 h-3" />{s} <span className="opacity-70">+ readiness</span></span>
+                {match.missingSkills.length ? match.missingSkills.map(s => (
+                  <span key={s} className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium" style={{ background: '#ff475718', color: '#ff4757' }}><X className="w-3 h-3" />{s}</span>
                 )) : <span className="text-xs" style={{ color: '#00b894' }}>You meet every requirement 🎉</span>}
               </div>
             </div>
@@ -128,7 +159,7 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
               <Sparkles className="w-3.5 h-3.5" style={{ color: vm.color }} />
               <span className="text-xs font-bold uppercase tracking-widest" style={{ color: vm.color }}>AI verdict · {vm.label}</span>
             </div>
-            <p className="text-sm" style={{ color: '#2d3436' }}>{jobVerdictText(verdict, comp.missing)}</p>
+            <p className="text-sm" style={{ color: '#2d3436' }}>{jobVerdictText(verdict, match.missingSkills)}</p>
           </div>
         </div>
 

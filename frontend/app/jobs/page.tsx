@@ -3,9 +3,9 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { mockJobs, mockCompanies } from '@/lib/mockData'
-import { defaultProfile } from '@/lib/careerData'
+import { defaultProfile, jobDetails } from '@/lib/careerData'
 import { readMyApplications } from '@/lib/applications'
-import { compatibility } from '@/lib/scoring'
+import { matchScore, type Level } from '@/lib/scoring'
 import { Search, MapPin, Briefcase, SlidersHorizontal, Wifi, Bookmark, ArrowRight, BadgeCheck, Check } from 'lucide-react'
 
 const companyByName: Record<string, { id: string; verified: boolean }> =
@@ -17,13 +17,38 @@ export default function JobsPage() {
   const [filterGhost, setFilterGhost] = useState('All')
   const [saved, setSaved] = useState<string[]>([])
   const [skills, setSkills] = useState<string[]>(defaultProfile.skills)
+  const [level, setLevel] = useState<Level>(defaultProfile.level)
+  const [programme, setProgramme] = useState<string>(defaultProfile.programme)
+  const [prefRole, setPrefRole] = useState<string | null>(null)
   const [appliedIds, setAppliedIds] = useState<string[]>([])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
-    try { const raw = localStorage.getItem('careerProfile'); if (raw) { const p = JSON.parse(raw); if (p.skills) setSkills(p.skills) } } catch { /* defaults */ }
+    try {
+      const raw = localStorage.getItem('careerProfile')
+      if (raw) {
+        const p = JSON.parse(raw)
+        if (p.skills) setSkills(p.skills)
+        if (p.level) setLevel(p.level)
+        if (p.programme) setProgramme(p.programme)
+        if (p.prefRole) setPrefRole(p.prefRole)
+      }
+    } catch { /* defaults */ }
     setAppliedIds(readMyApplications().map(a => a.jobId))
   }, [])
+
+  // Match Score for a job — same 6-dimension model as the job detail page.
+  function scoreFor(job: typeof mockJobs[number]) {
+    const d = jobDetails[job.id]
+    return matchScore(
+      { skills, level, programme, prefRole },
+      {
+        title: job.title, skills: job.skills, level: d?.level ?? 'fresh', industry: job.industry,
+        responsibilities: d?.responsibilities, niceToHave: d?.niceToHave,
+        education: d?.education, roleFamily: d?.roleFamily,
+      },
+    )
+  }
 
   const expOptions = ['All', 'Junior (0–2 yrs)', 'Mid (2–5 yrs)']
   const ghostOptions = ['All', 'Active', 'Passive', 'Risk']
@@ -91,8 +116,8 @@ export default function JobsPage() {
           <div className="text-center py-16 text-[#4a5568] font-mono">No jobs matched your filters.</div>
         ) : (
           <div className="grid md:grid-cols-2 gap-4">
-            {[...filtered].sort((a, b) => compatibility(skills, b.skills).score - compatibility(skills, a.skills).score).map(job => {
-              const comp = compatibility(skills, job.skills)
+            {[...filtered].sort((a, b) => scoreFor(b).score - scoreFor(a).score).map(job => {
+              const comp = scoreFor(job)
               const cColor = comp.score >= 85 ? '#00b894' : comp.score >= 60 ? '#b9831f' : '#ff4757'
               const cBg = comp.score >= 85 ? '#00b89418' : comp.score >= 60 ? '#fdcb6e33' : '#ff475718'
               return (
@@ -134,14 +159,14 @@ export default function JobsPage() {
 
                 <div className="flex flex-wrap gap-1.5 mb-2">
                   {job.skills.map(s => {
-                    const missing = comp.missing.includes(s)
+                    const missing = comp.missingSkills.includes(s)
                     return (
                       <span key={s} className="px-2 py-0.5 rounded-md text-xs font-mono" style={{ background: '#e0e5ec', color: missing ? '#ff4757' : '#4a5568', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>{s}</span>
                     )
                   })}
                 </div>
-                {comp.missing.length > 0 && (
-                  <p className="text-xs mb-4" style={{ color: '#4a5568' }}>You&apos;re missing <span className="font-bold" style={{ color: '#ff4757' }}>{comp.missing.length}</span> skill{comp.missing.length > 1 ? 's' : ''} for this role</p>
+                {comp.missingSkills.length > 0 && (
+                  <p className="text-xs mb-4" style={{ color: '#4a5568' }}>You&apos;re missing <span className="font-bold" style={{ color: '#ff4757' }}>{comp.missingSkills.length}</span> skill{comp.missingSkills.length > 1 ? 's' : ''} for this role</p>
                 )}
 
                 <div className="flex items-center gap-2 mb-5 p-3 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>

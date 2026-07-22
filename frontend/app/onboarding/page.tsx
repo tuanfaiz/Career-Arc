@@ -94,6 +94,7 @@ export default function OnboardingPage() {
       university: defaultProfile.university,
       skills: d.skills.length ? d.skills : defaultProfile.skills,
       animal: d.animal, breakdown: bd,
+      prefRole: d.prefRole, prefMode: d.prefMode,
     }
     localStorage.setItem('careerProfile', JSON.stringify(profile))
     localStorage.setItem('onboardingComplete', 'true')
@@ -321,7 +322,7 @@ export default function OnboardingPage() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs" style={{ color: '#4a5568' }}>The AI Career Coach can run mock interviews after onboarding.</p>
+                <p className="text-xs" style={{ color: '#4a5568' }}>SIFU, your interview coach, can run mock interviews after onboarding.</p>
               </div>
             )}
           </div>
