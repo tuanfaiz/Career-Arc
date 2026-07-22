@@ -47,9 +47,9 @@ const candidateGroups: NavGroup[] = [
     ],
   },
   {
-    label: 'AI Coach',
+    label: 'Interview Prep',
     items: [
-      { href: '/career-coach', icon: MessageSquare, label: 'AI Career Coach' },
+      { href: '/interview-coach', icon: MessageSquare, label: 'SIFU Interview Coach' },
     ],
   },
   {

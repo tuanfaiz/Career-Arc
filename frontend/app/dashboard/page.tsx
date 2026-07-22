@@ -4,15 +4,16 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import DashboardLayout from '@/components/DashboardLayout'
 import { mockJobs } from '@/lib/mockData'
-import { defaultProfile, levelByKey, nextActionText } from '@/lib/careerData'
+import { defaultProfile, levelByKey, nextActionText, jobDetails } from '@/lib/careerData'
 import {
-  computeCrs, riskOf, riskMeta, compatibility, CRS_LABELS, type CrsBreakdown, type Level,
+  computeCrs, riskOf, riskMeta, matchScore, CRS_LABELS, type CrsBreakdown, type Level,
 } from '@/lib/scoring'
 import { ArrowRight, Sparkles, FileText, Target, TrendingUp, DollarSign, Lightbulb, Compass } from 'lucide-react'
 
 interface Profile {
   name: string; level: Level; programme: string; university: string
   skills: string[]; animal?: string | null; breakdown: CrsBreakdown
+  prefRole?: string | null
 }
 
 export default function DashboardPage() {
@@ -39,7 +40,20 @@ export default function DashboardPage() {
   const lead = levelByKey[profile.level]?.dashboardLead ?? 'jobs'
 
   const ranked = mockJobs
-    .map(j => ({ job: j, comp: compatibility(profile.skills, j.skills) }))
+    .map(j => {
+      const d = jobDetails[j.id]
+      return {
+        job: j,
+        comp: matchScore(
+          { skills: profile.skills, level: profile.level, programme: profile.programme, prefRole: profile.prefRole },
+          {
+            title: j.title, skills: j.skills, level: d?.level ?? 'fresh', industry: j.industry,
+            responsibilities: d?.responsibilities, niceToHave: d?.niceToHave,
+            education: d?.education, roleFamily: d?.roleFamily,
+          },
+        ),
+      }
+    })
     .sort((a, b2) => b2.comp.score - a.comp.score)
   const topJobs = ranked.slice(0, 3)
 
@@ -146,8 +160,8 @@ export default function DashboardPage() {
                   <div className="px-2 py-1 rounded-lg text-xs font-mono font-bold flex-shrink-0" style={{ background: comp.score >= 85 ? '#00b89422' : comp.score >= 60 ? '#fdcb6e33' : '#ff475722', color: comp.score >= 85 ? '#00b894' : comp.score >= 60 ? '#b9831f' : '#ff4757' }}>{comp.score}%</div>
                 </div>
                 <div className="text-xs font-mono mb-3" style={{ color: '#4a5568' }}>{job.salary} · {job.location}</div>
-                {comp.missing.length > 0 && (
-                  <div className="text-xs mb-3" style={{ color: '#4a5568' }}>Missing: {comp.missing.slice(0, 2).map(m => <span key={m} className="font-medium" style={{ color: '#ff4757' }}>{m} </span>)}</div>
+                {comp.missingSkills.length > 0 && (
+                  <div className="text-xs mb-3" style={{ color: '#4a5568' }}>Missing: {comp.missingSkills.slice(0, 2).map(m => <span key={m} className="font-medium" style={{ color: '#ff4757' }}>{m} </span>)}</div>
                 )}
                 <span className="flex items-center justify-center gap-1 w-full py-2.5 text-sm font-semibold rounded-xl" style={{ color: '#2d3436', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff' }}>
                   View &amp; compare <ArrowRight className="w-3 h-3" />

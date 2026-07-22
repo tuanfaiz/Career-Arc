@@ -182,20 +182,37 @@ export interface JobDetail {
   scope: string
   responsibilities: string[]
   niceToHave: string[]
+  /** Broad role family — feeds the role-similarity dimension of the Match Score. */
+  roleFamily: string
+  /** Fields of study the employer prefers — feeds the education dimension. */
+  education: string[]
 }
 
 export const jobDetails: Record<string, JobDetail> = {
-  '1': { level: 'fresh', workArrangement: 'On-site', scope: 'Build and maintain enterprise web applications for Petronas digital transformation initiatives.', responsibilities: ['Develop features across the React + Node.js stack', 'Write tested, reviewable code', 'Collaborate with senior engineers on architecture'], niceToHave: ['AWS', 'Docker'] },
-  '2': { level: 'fresh', workArrangement: 'Remote', scope: 'Work across the full stack on systems serving millions of Grab users daily.', responsibilities: ['Ship features end-to-end', 'Own services in production', 'Participate in on-call rotation'], niceToHave: ['Kubernetes', 'Go'] },
-  '3': { level: 'fresh', workArrangement: 'Hybrid', scope: 'Modernise CIMB core banking systems and digital channels.', responsibilities: ['Develop Java/Spring Boot services', 'Integrate with Oracle databases', 'Support digital banking releases'], niceToHave: ['Microservices', 'Kafka'] },
-  '4': { level: 'fresh', workArrangement: 'Remote', scope: 'Build performant UIs for AirAsia digital travel products.', responsibilities: ['Implement responsive React/Next.js interfaces', 'Partner with designers on UX', 'Optimise web performance'], niceToHave: ['Tailwind CSS', 'Testing'] },
-  '5': { level: 'fresh', workArrangement: 'On-site', scope: 'Analyse gig-platform data to grow GoGet’s on-demand workforce.', responsibilities: ['Build dashboards and reports', 'Run SQL analyses', 'Present insights to stakeholders'], niceToHave: ['Tableau', 'Python'] },
-  '6': { level: 'mid', workArrangement: 'On-site', scope: 'Engineer payment infrastructure powering millions of transactions.', responsibilities: ['Design Go microservices', 'Optimise Kafka/Redis pipelines', 'Ensure reliability at scale'], niceToHave: ['System Design', 'Observability'] },
-  '7': { level: 'mid', workArrangement: 'Hybrid', scope: 'Lead product development for Axiata digital services across SEA.', responsibilities: ['Own product roadmap', 'Run discovery and define specs', 'Work with engineering and design'], niceToHave: ['SQL', 'Analytics'] },
-  '8': { level: 'mid', workArrangement: 'Remote', scope: 'Build and maintain infrastructure powering the Maxis network.', responsibilities: ['Manage AWS infrastructure as code', 'Run CI/CD pipelines', 'Improve deployment reliability'], niceToHave: ['Terraform', 'Kubernetes'] },
-  '9': { level: 'fresh', workArrangement: 'On-site', scope: 'Design intuitive experiences for Shopee shoppers.', responsibilities: ['Run user research', 'Produce wireframes and prototypes', 'Partner with engineers on delivery'], niceToHave: ['Design systems', 'Prototyping'] },
-  '10': { level: 'mid', workArrangement: 'Remote', scope: 'Build ML models and pipelines for enterprise clients across ASEAN.', responsibilities: ['Develop and deploy ML models', 'Build MLOps pipelines', 'Collaborate with data engineers'], niceToHave: ['MLOps', 'PyTorch'] },
+  '1': { level: 'fresh', workArrangement: 'On-site', roleFamily: 'engineering', education: ['Computer Science', 'Software Engineering', 'Information Technology'], scope: 'Build and maintain enterprise web applications for Petronas digital transformation initiatives.', responsibilities: ['Develop features across the React + Node.js stack', 'Write tested, reviewable code', 'Collaborate with senior engineers on architecture'], niceToHave: ['AWS', 'Docker'] },
+  '2': { level: 'fresh', workArrangement: 'Remote', roleFamily: 'engineering', education: ['Computer Science', 'Software Engineering'], scope: 'Work across the full stack on systems serving millions of Grab users daily.', responsibilities: ['Ship features end-to-end', 'Own services in production', 'Participate in on-call rotation'], niceToHave: ['Kubernetes', 'Go'] },
+  '3': { level: 'fresh', workArrangement: 'Hybrid', roleFamily: 'engineering', education: ['Computer Science', 'Software Engineering', 'Information Systems'], scope: 'Modernise CIMB core banking systems and digital channels.', responsibilities: ['Develop Java/Spring Boot services', 'Integrate with Oracle databases', 'Support digital banking releases'], niceToHave: ['Microservices', 'Kafka'] },
+  '4': { level: 'fresh', workArrangement: 'Remote', roleFamily: 'engineering', education: ['Computer Science', 'Software Engineering', 'Design & Media'], scope: 'Build performant UIs for AirAsia digital travel products.', responsibilities: ['Implement responsive React/Next.js interfaces', 'Partner with designers on UX', 'Optimise web performance'], niceToHave: ['Tailwind CSS', 'Testing'] },
+  '5': { level: 'fresh', workArrangement: 'On-site', roleFamily: 'data', education: ['Data Science', 'Business Analytics', 'Information Systems'], scope: 'Analyse gig-platform data to grow GoGet’s on-demand workforce.', responsibilities: ['Build dashboards and reports', 'Run SQL analyses', 'Present insights to stakeholders'], niceToHave: ['Tableau', 'Python'] },
+  '6': { level: 'mid', workArrangement: 'On-site', roleFamily: 'engineering', education: ['Computer Science', 'Software Engineering'], scope: 'Engineer payment infrastructure powering millions of transactions.', responsibilities: ['Design Go microservices', 'Optimise Kafka/Redis pipelines', 'Ensure reliability at scale'], niceToHave: ['System Design', 'Observability'] },
+  '7': { level: 'mid', workArrangement: 'Hybrid', roleFamily: 'product', education: ['Information Systems', 'Business Analytics', 'Computer Science'], scope: 'Lead product development for Axiata digital services across SEA.', responsibilities: ['Own product roadmap', 'Run discovery and define specs', 'Work with engineering and design'], niceToHave: ['SQL', 'Analytics'] },
+  '8': { level: 'mid', workArrangement: 'Remote', roleFamily: 'engineering', education: ['Computer Science', 'Information Technology'], scope: 'Build and maintain infrastructure powering the Maxis network.', responsibilities: ['Manage AWS infrastructure as code', 'Run CI/CD pipelines', 'Improve deployment reliability'], niceToHave: ['Terraform', 'Kubernetes'] },
+  '9': { level: 'fresh', workArrangement: 'On-site', roleFamily: 'design', education: ['Design & Media', 'Information Systems'], scope: 'Design intuitive experiences for Shopee shoppers.', responsibilities: ['Run user research', 'Produce wireframes and prototypes', 'Partner with engineers on delivery'], niceToHave: ['Design systems', 'Prototyping'] },
+  '10': { level: 'mid', workArrangement: 'Remote', roleFamily: 'data', education: ['Data Science', 'Computer Science'], scope: 'Build ML models and pipelines for enterprise clients across ASEAN.', responsibilities: ['Develop and deploy ML models', 'Build MLOps pipelines', 'Collaborate with data engineers'], niceToHave: ['MLOps', 'PyTorch'] },
 }
+
+/**
+ * Which job each demo applicant applied for. Shared by the employer dashboard
+ * and the applicant detail page so the Match Score is computed against the
+ * actual role they applied to.
+ */
+export const applicantRoles: { id: string; jobId: string; role: string; status: string; color: string }[] = [
+  { id: 'c1', jobId: '4', role: 'Frontend Developer', status: 'Shortlisted', color: '#00b894' },
+  { id: 'c9', jobId: '1', role: 'Junior Software Engineer', status: 'Reviewed', color: '#6c5ce7' },
+  { id: 'c12', jobId: '10', role: 'Machine Learning Engineer', status: 'Pending', color: '#fdcb6e' },
+  { id: 'c20', jobId: '5', role: 'Data Analyst', status: 'Pending', color: '#fdcb6e' },
+  { id: 'c7', jobId: '7', role: 'Product Manager (Tech)', status: 'Interview', color: '#ff4757' },
+]
 
 // --- Company reviews (simulated, Glassdoor-style) ----------------------------
 

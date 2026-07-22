@@ -3,12 +3,13 @@ import { use, useState, useEffect } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import DashboardLayout from '@/components/DashboardLayout'
-import { candidates, resumeFor, levelByKey } from '@/lib/careerData'
+import { candidates, resumeFor, levelByKey, applicantRoles, jobDetails } from '@/lib/careerData'
+import { mockJobs } from '@/lib/mockData'
 import { animals, type AnimalKey } from '@/lib/animalTest'
-import { riskMeta, CRS_LABELS, type CrsBreakdown } from '@/lib/scoring'
+import { riskMeta, CRS_LABELS, matchScore, type CrsBreakdown } from '@/lib/scoring'
 import { STORY_PROMPTS, getSessionBlobUrl, formatClock } from '@/lib/storyVideo'
 import {
-  ArrowLeft, Mail, GraduationCap, CheckSquare, CalendarClock, Download, Check, Video, Play,
+  ArrowLeft, Mail, GraduationCap, CheckSquare, CalendarClock, Download, Check, Video, Play, Target,
 } from 'lucide-react'
 
 export default function ApplicantDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -29,6 +30,19 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
   const rm = riskMeta[c.risk]
   const animal = animals[c.animal as AnimalKey]
   const resume = resumeFor(c)
+
+  // Match Score against the role this person actually applied for.
+  const appliedTo = applicantRoles.find(a => a.id === id)
+  const job = appliedTo ? mockJobs.find(j => j.id === appliedTo.jobId) : undefined
+  const jd = job ? jobDetails[job.id] : undefined
+  const match = job ? matchScore(
+    { skills: c.skills, level: c.level, programme: c.programme },
+    {
+      title: job.title, skills: job.skills, level: jd?.level ?? 'fresh', industry: job.industry,
+      responsibilities: jd?.responsibilities, niceToHave: jd?.niceToHave,
+      education: jd?.education, roleFamily: jd?.roleFamily,
+    },
+  ) : null
 
   function mockDownload() { setDownloaded(true); setTimeout(() => setDownloaded(false), 2500) }
 
@@ -58,6 +72,54 @@ export default function ApplicantDetailPage({ params }: { params: Promise<{ id: 
             </div>
           </div>
         </div>
+
+        {/* Match to this role — CRS says ready, this says FIT */}
+        {match && job && (
+          <div className="card-screw rounded-2xl p-5 sm:p-6" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <Target className="w-5 h-5" style={{ color: '#ff4757' }} />
+              <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Match to this role</h3>
+              <span className="text-xs font-mono px-2 py-0.5 rounded-lg" style={{ background: '#e0e5ec', color: '#4a5568' }}>{job.title}</span>
+            </div>
+            <p className="text-sm mb-5" style={{ color: '#4a5568' }}>
+              Readiness says they&apos;re prepared. <strong style={{ color: '#2d3436' }}>This says they fit.</strong>
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-6">
+              {/* Overall */}
+              <div className="text-center flex-shrink-0">
+                <div className="text-5xl font-black font-mono" style={{ color: match.score >= 70 ? '#00b894' : match.score >= 45 ? '#f39c12' : '#ff4757' }}>{match.score}%</div>
+                <div className="text-xs uppercase tracking-widest mt-1" style={{ color: '#4a5568' }}>Match Score</div>
+              </div>
+
+              {/* Weighted dimensions */}
+              <div className="flex-1 w-full space-y-2.5">
+                {match.dimensions.map(d => (
+                  <div key={d.key}>
+                    <div className="flex items-baseline justify-between gap-2 mb-1 flex-wrap">
+                      <span className="text-xs font-medium" style={{ color: '#2d3436' }}>
+                        {d.label}
+                        <span className="ml-1.5 font-mono" style={{ color: '#7a8699' }}>{Math.round(d.weight * 100)}%</span>
+                      </span>
+                      <span className="text-xs font-mono font-bold" style={{ color: d.score >= 70 ? '#00b894' : d.score >= 45 ? '#f39c12' : '#ff4757' }}>{d.score}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ background: '#e0e5ec', boxShadow: 'inset 1px 1px 2px #babecc, inset -1px -1px 2px #ffffff' }}>
+                      <div className="h-full rounded-full" style={{ width: `${d.score}%`, background: d.score >= 70 ? '#00b894' : d.score >= 45 ? '#f39c12' : '#ff4757' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {match.missingSkills.length > 0 && (
+              <div className="mt-4 px-4 py-3 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
+                <span className="text-xs" style={{ color: '#4a5568' }}>
+                  <strong style={{ color: '#2d3436' }}>Gaps to probe in interview:</strong> {match.missingSkills.slice(0, 4).join(', ')}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Story Video — what a resume can't show */}
         <div className="card-screw rounded-2xl p-5 sm:p-6" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
