@@ -263,6 +263,14 @@ export function whyRecommendation(c: ScoredCandidate): string {
   return `${c.name.split(' ')[0]}’s readiness is dragged down most by ${CRS_LABELS[weak]} (${c.breakdown[weak]}/100). A ${c.action.toLowerCase()} targets that weakest component directly — the highest-leverage intervention for this student.`
 }
 
+// The "fit, not speed" insight — reads the speedVsFit table and finds the field
+// that hires fastest but keeps people least.
+export function retentionInsight(rows: { field: string; timeToHire: number; retention: number }[]): string {
+  const worst = [...rows].sort((a, b) => (a.retention - a.timeToHire * 5) - (b.retention - b.timeToHire * 5))[0]
+  const best = [...rows].sort((a, b) => b.retention - a.retention)[0]
+  return `${worst.field} graduates are hired fastest (${worst.timeToHire} months) but only ${worst.retention}% are still in that job at 12 months — the speed is hiding a fit problem. ${best.field} takes longer to place but holds ${best.retention}%. Placing graduates faster is not the same as placing them well.`
+}
+
 export function universityInsight(): string {
   const worst = programmesSummary[0]
   return `${cohort.atRisk} students are at high risk this cohort. ${worst.name} needs the most support (avg readiness ${worst.avgCrs}, ${worst.riskCount} high-risk). Running a targeted portfolio + resume clinic for this group could lift cohort readiness by an estimated 6–8 points.`

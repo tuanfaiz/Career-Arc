@@ -212,8 +212,8 @@ export const mockPortfolioEntries = [
   },
   {
     id: '4', year: '2025', title: 'Career Arc', type: 'Hackathon Project',
-    description: 'Built Career Arc for a hackathon — an AI-powered career platform for Malaysian job seekers with ATS scanner, career path simulator, and anti-ghosting tracker.',
-    descriptionPolished: 'Co-founded and engineered Career Arc, a full-stack AI-powered career intelligence platform targeting 300,000 annual Malaysian graduates. The platform integrates ATS resume analysis, a 40-year career simulation engine, anti-ghosting employer accountability scores, and a regional cost-of-living calculator, built and shipped within a 48-hour hackathon sprint.',
+    description: 'Built Career Arc for a hackathon — a career platform for Malaysian Gen Z with a readiness score, course advisor, and anti-ghosting tracker.',
+    descriptionPolished: 'Co-founded and engineered Career Arc, a full-stack career intelligence platform targeting 300,000 annual Malaysian graduates. The platform introduces a unified Career Readiness Score read by candidates, employers and universities, a pre-university course advisor, and anti-ghosting employer accountability — built and shipped within a hackathon sprint.',
     tags: ['Next.js', 'TypeScript', 'Tailwind CSS', 'AI Integration', 'Hackathon'],
     github: 'https://github.com/amirulhakim/career-arc',
     award: 'Hackathon Entry 2025', teamSize: 3,
@@ -250,6 +250,7 @@ export const mockUniversityStats = {
   avgTimeToHire: 3.2,
   avgStartingSalary: 3400,
   withinField: 74,
+  retention12mo: 64,
   programs: [
     { name: 'Computer Science', employed: 92, grads: 540 },
     { name: 'Engineering', employed: 88, grads: 880 },
@@ -279,6 +280,10 @@ export const mockMinistryStats = {
   employmentRate: 84,
   avgTimeToHire: 3.8,
   universitiesTracked: 50,
+  // Retention: the metric nobody tracks today. Time-to-hire measures SPEED;
+  // staying in the first job measures FIT.
+  retention12mo: 61,
+  avgTenureMonths: 14.2,
   byField: [
     { field: 'ICT & Computing', employed: 89 },
     { field: 'Health Sciences', employed: 88 },
@@ -286,6 +291,16 @@ export const mockMinistryStats = {
     { field: 'Business & Finance', employed: 82 },
     { field: 'Education', employed: 80 },
     { field: 'Arts & Humanities', employed: 73 },
+  ],
+  // Same fields, but: how fast they get hired vs how many are still there at 12 months.
+  // Fields where hiring is fast but retention is low = a FIT problem, not a supply problem.
+  speedVsFit: [
+    { field: 'ICT & Computing', timeToHire: 2.6, retention: 54 },
+    { field: 'Health Sciences', timeToHire: 4.1, retention: 82 },
+    { field: 'Engineering', timeToHire: 3.4, retention: 68 },
+    { field: 'Business & Finance', timeToHire: 3.9, retention: 57 },
+    { field: 'Education', timeToHire: 4.6, retention: 79 },
+    { field: 'Arts & Humanities', timeToHire: 5.2, retention: 49 },
   ],
   trend: [
     { year: '2021', rate: 75 },
@@ -333,8 +348,60 @@ export const mockCandidates = [
   { id: '5', name: 'Haziq Ibrahim', role: 'Fresh Graduate · IT', atsScore: 72, experience: '0 yrs', status: 'Applied', university: 'UiTM' },
 ]
 
+// Skills that survive automation vs skills that are being eaten by it.
+// This is the on-screen answer to "will I be the scared 40-year-old?"
+export const futureProof = {
+  durable: [
+    { skill: 'System design & architecture', why: 'Someone must decide what to build and why' },
+    { skill: 'Communication & stakeholder trust', why: 'Nobody promotes a model into a client meeting' },
+    { skill: 'Debugging real production failures', why: 'Messy, contextual, high-stakes — AI is weakest here' },
+    { skill: 'Judgement under ambiguity', why: 'The job is choosing, not just executing' },
+  ],
+  atRisk: [
+    { skill: 'Boilerplate CRUD coding', why: 'AI already writes most of it' },
+    { skill: 'Manual test scripting', why: 'Increasingly generated automatically' },
+    { skill: 'Static report building', why: 'Self-serve BI tools are replacing this' },
+  ],
+}
+
 export const careerPathData = {
   name: 'Amirul Hakim', degree: 'B.Sc. Computer Science · UPM 2023',
+  // A 4-year plan is a PLAN — concrete and actionable.
+  // Anything past that is a SCENARIO — explicitly uncertain.
+  fourYear: {
+    A: [
+      { year: 1, role: 'Junior Developer', salary: 3500, doThis: 'Ship 3 production features end-to-end. Learn Git flow, code review, and testing properly.' },
+      { year: 2, role: 'Developer', salary: 4800, doThis: 'Own one service. Start AWS certification — cloud is the single biggest salary lever at +29%.' },
+      { year: 3, role: 'Mid-Level Developer', salary: 6000, doThis: 'Lead a small feature team. Learn system design; begin mentoring an intern.' },
+      { year: 4, role: 'Senior Developer (track)', salary: 8000, doThis: 'Own architecture for a whole module. This is where the tech-lead fork opens.' },
+    ],
+    B: [
+      { year: 1, role: 'Junior Developer', salary: 3500, doThis: 'Build technical credibility first — PMs without it get ignored by engineers.' },
+      { year: 2, role: 'Developer + product exposure', salary: 4800, doThis: 'Volunteer for user interviews and scoping. Learn SQL well enough to answer your own questions.' },
+      { year: 3, role: 'Associate PM', salary: 5500, doThis: 'Expect a short salary dip here — you are buying a career change. Own one small product area.' },
+      { year: 4, role: 'Product Manager', salary: 7500, doThis: 'Run a full discovery-to-launch cycle. Build stakeholder management deliberately.' },
+    ],
+    C: [
+      { year: 1, role: 'Junior Developer (employed)', salary: 3500, doThis: 'Stay employed. Bank savings and learn how a real business actually operates.' },
+      { year: 2, role: 'Developer + first freelance client', salary: 5200, doThis: 'Land 1 paying client on the side. Learn quoting, scoping and invoicing.' },
+      { year: 3, role: 'Freelancer (2 retainers)', salary: 7000, doThis: 'Reach 2 retainer clients before quitting — this is the runway that decides survival.' },
+      { year: 4, role: 'Independent / founding', salary: 8500, doThis: 'Go full independent only once 6 months of expenses are banked.' },
+    ],
+  },
+  scenarios: {
+    A: {
+      '2030': 'Most routine code is AI-generated. Engineers who survive are the ones reviewing, integrating and owning systems rather than typing them. Expect fewer junior roles and a harder entry point.',
+      '2040': 'Possibly a much smaller number of engineers managing far larger automated systems — or the opposite, an explosion of software demand. Nobody honestly knows. Bet on judgement, not syntax.',
+    },
+    B: {
+      '2030': 'Product roles grow as companies need people who decide what AI should build. Domain expertise (health, finance, education) becomes the real differentiator.',
+      '2040': 'Product management may split into "AI orchestration" and "human experience" tracks. Communication skills stay valuable in both.',
+    },
+    C: {
+      '2030': 'Solo builders can ship what used to need a team of five. More one-person businesses, but far more competition and price pressure.',
+      '2040': 'Independent work could become a normal default rather than a risk — which is partly why Universal Basic Income keeps entering the conversation.',
+    },
+  },
   nodes: [
     { year: 0, role: 'Junior Developer', salary: 3500, current: true, fork: false },
     { year: 2, role: 'Mid-Level Developer', salary: 6000, current: false, fork: false },

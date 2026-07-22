@@ -2,7 +2,8 @@
 import DashboardLayout from '@/components/DashboardLayout'
 import StatCard from '@/components/StatCard'
 import { mockMinistryStats as m, sdgGoals } from '@/lib/mockData'
-import { Users, TrendingUp, Clock, School, Landmark, BarChart3, PieChart, Globe } from 'lucide-react'
+import { retentionInsight } from '@/lib/careerData'
+import { Users, TrendingUp, Clock, Anchor, Landmark, BarChart3, PieChart, Globe, Sparkles } from 'lucide-react'
 
 export default function MinistryPage() {
   const maxRate = Math.max(...m.trend.map(t => t.rate))
@@ -26,8 +27,61 @@ export default function MinistryPage() {
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard label="Graduates (National)" value={`${(m.graduatesNational / 1000).toFixed(0)}K`} icon={<Users size={18} />} />
           <StatCard label="National Employment" value={`${m.employmentRate}%`} icon={<TrendingUp size={18} />} accent />
-          <StatCard label="Avg Time-to-Hire" value={`${m.avgTimeToHire}mo`} icon={<Clock size={18} />} subtitle="Across all fields" />
-          <StatCard label="Universities Tracked" value={`${m.universitiesTracked}`} icon={<School size={18} />} />
+          <StatCard label="Avg Time-to-Hire" value={`${m.avgTimeToHire}mo`} icon={<Clock size={18} />} subtitle="Speed of placement" />
+          <StatCard label="Still in 1st Job @12mo" value={`${m.retention12mo}%`} icon={<Anchor size={18} />} subtitle={`Avg tenure ${m.avgTenureMonths} months`} />
+        </div>
+
+        {/* Speed vs Stickiness — the metric MOHE does not track today */}
+        <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <Anchor className="w-5 h-5" style={{ color: '#19486a' }} />
+            <h3 className="font-bold uppercase tracking-widest text-sm" style={{ color: '#2d3436' }}>Speed vs Stickiness</h3>
+          </div>
+          <p className="text-sm mb-6" style={{ color: '#4a5568' }}>
+            Time-to-hire measures <strong>speed</strong>. Retention measures <strong>fit</strong>. A graduate
+            hired in 2 months who quits in 5 is counted as a success today.
+          </p>
+
+          <div className="flex flex-col gap-4">
+            {m.speedVsFit.map(row => {
+              const risk = row.retention < 60
+              return (
+                <div key={row.field}>
+                  <div className="flex items-center justify-between mb-1.5 flex-wrap gap-2">
+                    <span className="text-sm font-medium" style={{ color: '#2d3436' }}>{row.field}</span>
+                    <span className="text-xs font-mono" style={{ color: '#4a5568' }}>
+                      hired in <strong style={{ color: '#19486a' }}>{row.timeToHire}mo</strong> · still there{' '}
+                      <strong style={{ color: risk ? '#ff4757' : '#00b894' }}>{row.retention}%</strong>
+                      {risk && <span style={{ color: '#ff4757' }}> · fit risk</span>}
+                    </span>
+                  </div>
+                  {/* two stacked bars: speed (inverted so shorter = fuller) and retention */}
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
+                        <div className="h-full rounded-full" style={{ width: `${Math.max(0, 100 - row.timeToHire * 16)}%`, background: 'linear-gradient(90deg, #19486a, #4a90c2)' }} />
+                      </div>
+                      <div className="text-xs mt-0.5" style={{ color: '#7a8699' }}>speed</div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="h-2 rounded-full overflow-hidden" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
+                        <div className="h-full rounded-full" style={{ width: `${row.retention}%`, background: risk ? 'linear-gradient(90deg, #ff4757, #ff8a94)' : 'linear-gradient(90deg, #00b894, #55d6b6)' }} />
+                      </div>
+                      <div className="text-xs mt-0.5" style={{ color: '#7a8699' }}>stickiness</div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+
+          <div className="mt-6 rounded-xl p-4 flex items-start gap-3" style={{ background: 'linear-gradient(135deg, #f0f2f5 0%, #eef3f8 100%)', border: '1px solid #19486a33' }}>
+            <Sparkles className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: '#19486a' }} />
+            <div>
+              <div className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: '#19486a' }}>AI Insight · Fit over speed</div>
+              <p className="text-sm" style={{ color: '#2d3436' }}>{retentionInsight(m.speedVsFit)}</p>
+            </div>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8">

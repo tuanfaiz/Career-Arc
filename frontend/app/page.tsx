@@ -1,6 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-import { User, ScanLine, Shield, TrendingUp, BookOpen, Calculator, Target, ArrowRight, ChevronRight } from 'lucide-react'
+import { User, ScanLine, Shield, TrendingUp, BookOpen, Compass, Target, ArrowRight, ChevronRight } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -16,12 +16,12 @@ export default function LandingPage() {
             Talentbank Career OS Hackathon 2025
           </div>
           <h1 className="text-5xl lg:text-6xl font-black tracking-tight leading-none mb-6" style={{ color: '#2d3436' }}>
-            Navigate Your<br />
-            <span style={{ color: '#ff4757' }}>40-Year Career</span><br />
-            Journey
+            Career Clarity<br />
+            <span style={{ color: '#ff4757' }}>for Gen Z</span><br />
+            Malaysia
           </h1>
           <p className="text-lg mb-10 leading-relaxed" style={{ color: '#4a5568' }}>
-            Malaysia&apos;s first AI-powered career platform. ATS scanning, anti-ghosting protection, and 40-year path simulation — built for Malaysian fresh graduates.
+            Know what to study, what to apply for, and what your next 4 years actually look like. Because nobody should reach 40 and discover they picked the wrong path.
           </p>
           <div className="flex flex-wrap gap-4 mb-8">
             <Link href="/login"
@@ -132,9 +132,9 @@ export default function LandingPage() {
             { icon: <User size={24} />, title: 'Smart Profile Builder', desc: 'AI-powered profile that highlights what Malaysian employers actually want', color: '#6c5ce7' },
             { icon: <ScanLine size={24} />, title: 'ATS Resume Scanner', desc: 'Know your ATS score before you apply. Fix it before they ghost you.', color: '#ff4757' },
             { icon: <Shield size={24} />, title: 'Anti-Ghosting Tracker', desc: 'See employer response rates. Apply to companies that actually reply.', color: '#00b09b' },
-            { icon: <TrendingUp size={24} />, title: 'Career Path Simulator', desc: 'Visualize 3 career paths for the next 40 years. Switch lanes confidently.', color: '#ff4757' },
+            { icon: <TrendingUp size={24} />, title: 'Next 4 Years, Mapped', desc: 'A concrete year-by-year plan — plus honest scenarios for what comes after.', color: '#ff4757' },
             { icon: <BookOpen size={24} />, title: 'Living Portfolio', desc: 'Your work, professionally packaged. One link, infinite impressions.', color: '#6c5ce7' },
-            { icon: <Calculator size={24} />, title: 'Cost of Living Calculator', desc: 'RM 8,500 in KLCC vs RM 7,000 in Cyberjaya — which job pays more REALLY?', color: '#00b09b' },
+            { icon: <Compass size={24} />, title: 'Course Advisor', desc: 'Still in school? Find out what to study before you commit 4 years to it.', color: '#00b09b' },
           ].map((feature, i) => (
             <div key={i} className="card-screw card-hover rounded-2xl p-8"
               style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>

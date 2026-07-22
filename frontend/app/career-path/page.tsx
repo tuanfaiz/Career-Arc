@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { careerPathData } from '@/lib/mockData'
-import { TrendingUp, ArrowRight, CheckCircle, Sparkles } from 'lucide-react'
+import { careerPathData, futureProof } from '@/lib/mockData'
+import { TrendingUp, ArrowRight, CheckCircle, Sparkles, Telescope, ShieldCheck, AlertTriangle, Calendar } from 'lucide-react'
 
 type PathKey = 'A' | 'B' | 'C'
 
@@ -63,65 +63,11 @@ export default function CareerPathPage() {
               <TrendingUp size={22} className="text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-black" style={{ color: '#2d3436' }}>Your 40-Year Career Arc</h2>
+              <h2 className="text-2xl font-black" style={{ color: '#2d3436' }}>Your Next 4 Years</h2>
               <p className="text-sm mt-1" style={{ color: '#4a5568' }}>{careerPathData.name} · {careerPathData.degree}</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Timeline */}
-        <div className="card-screw rounded-2xl p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
-          <h3 className="font-bold text-sm uppercase tracking-widest mb-6" style={{ color: '#2d3436' }}>Career Timeline</h3>
-          <div className="overflow-x-auto pb-4">
-            <div className="flex items-stretch gap-0" style={{ minWidth: '900px' }}>
-              {careerPathData.nodes.map((node, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="flex flex-col items-center">
-                    <div className="text-xs font-mono font-bold mb-3" style={{ color: '#4a5568' }}>{node.year === 0 ? 'NOW' : `Year ${node.year}`}</div>
-                    <div className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center text-center"
-                      style={node.current ? { background: '#ff4757', boxShadow: '6px 6px 12px rgba(255,71,87,0.4)' }
-                        : node.fork ? { background: '#2d3436', boxShadow: '6px 6px 12px rgba(45,52,54,0.3)' }
-                        : { background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
-                      <span className="text-xs font-bold leading-tight" style={{ color: node.current || node.fork ? 'white' : '#2d3436' }}>
-                        {node.role.split(' ').map((w, wi) => <span key={wi}>{w}<br /></span>)}
-                      </span>
-                    </div>
-                    <div className="text-xs font-mono font-bold mt-3" style={{ color: node.current ? '#ff4757' : '#4a5568' }}>{fmt(node.salary)}</div>
-                  </div>
-                  {i < careerPathData.nodes.length - 1 && (
-                    <div className="flex items-center mx-3 mt-1">
-                      <div className="h-0.5 w-12" style={{ background: 'linear-gradient(90deg, #babecc, #ff4757)' }} />
-                      <ArrowRight size={14} style={{ color: '#ff4757' }} />
-                    </div>
-                  )}
-                </div>
-              ))}
-              <div className="flex items-center mx-4">
-                <div className="h-0.5 w-8" style={{ background: '#ff4757' }} />
-                <div className="w-3 h-3 rounded-full" style={{ background: '#ff4757', boxShadow: '0 0 8px rgba(255,71,87,0.6)' }} />
-              </div>
-              <div className="flex items-center">
-                {path.nodes.slice(1).map((node, i) => (
-                  <div key={i} className="flex items-center">
-                    <div className="flex flex-col items-center">
-                      <div className="text-xs font-mono font-bold mb-3" style={{ color: '#4a5568' }}>Year {node.year}</div>
-                      <div className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center text-center"
-                        style={{ background: path.color, boxShadow: `6px 6px 12px ${path.color}44`, opacity: 0.85 + i * 0.05 }}>
-                        <span className="text-xs font-bold text-white leading-tight">
-                          {node.role.split(' ').map((w, wi) => <span key={wi}>{w}<br /></span>)}
-                        </span>
-                      </div>
-                      <div className="text-xs font-mono font-bold mt-3" style={{ color: path.color }}>{fmt(node.salary)}</div>
-                    </div>
-                    {i < path.nodes.slice(1).length - 1 && (
-                      <div className="flex items-center mx-3 mt-1">
-                        <div className="h-0.5 w-10" style={{ background: path.color + '66' }} />
-                        <ArrowRight size={14} style={{ color: path.color }} />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
+              <p className="text-sm mt-2" style={{ color: '#4a5568' }}>
+                A plan you can actually act on — not a 40-year fantasy. What comes after 4 years is shown separately, as <strong>scenarios</strong>.
+              </p>
             </div>
           </div>
         </div>
@@ -144,6 +90,90 @@ export default function CareerPathPage() {
               </button>
             )
           })}
+        </div>
+
+        {/* The 4-year plan — concrete and actionable */}
+        <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Calendar className="w-5 h-5" style={{ color: path.color }} />
+            <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Your 4-Year Plan — {path.label}</h3>
+          </div>
+          <p className="text-sm mb-6" style={{ color: '#4a5568' }}>Year by year, what to actually <strong>do</strong> — not just what to become.</p>
+          <div className="flex flex-col gap-3">
+            {careerPathData.fourYear[selectedPath].map(y => (
+              <div key={y.year} className="flex items-start gap-4 p-4 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
+                <div className="w-11 h-11 rounded-xl flex flex-col items-center justify-center flex-shrink-0" style={{ background: path.color, boxShadow: `3px 3px 8px ${path.color}55` }}>
+                  <span className="text-xs font-black text-white leading-none">YR</span>
+                  <span className="text-sm font-black text-white font-mono leading-none mt-0.5">{y.year}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
+                    <span className="text-sm font-bold" style={{ color: '#2d3436' }}>{y.role}</span>
+                    <span className="text-xs font-mono font-bold" style={{ color: path.color }}>{fmt(y.salary)}/mo</span>
+                  </div>
+                  <p className="text-sm mt-1 leading-relaxed" style={{ color: '#4a5568' }}>{y.doThis}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Beyond 4 years — scenarios, not predictions */}
+        <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Telescope className="w-5 h-5" style={{ color: '#4a5568' }} />
+            <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Beyond 4 Years — Scenarios, Not Predictions</h3>
+          </div>
+          <p className="text-sm mb-5" style={{ color: '#4a5568' }}>
+            The world changes too fast to promise you a 40-year path. These are scenarios to <em>think with</em> — not forecasts.
+          </p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {(['2030', '2040'] as const).map(yr => (
+              <div key={yr} className="rounded-xl p-5" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
+                <div className="text-2xl font-black font-mono mb-2" style={{ color: '#4a5568' }}>{yr}</div>
+                <p className="text-sm leading-relaxed" style={{ color: '#2d3436' }}>{careerPathData.scenarios[selectedPath][yr]}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Future-proof check */}
+        <div className="card-screw rounded-2xl p-6 sm:p-8" style={{ background: '#f0f2f5', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff' }}>
+          <div className="flex items-center gap-2 mb-1">
+            <ShieldCheck className="w-5 h-5" style={{ color: '#00b894' }} />
+            <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>Future-Proof Check</h3>
+          </div>
+          <p className="text-sm mb-5" style={{ color: '#4a5568' }}>
+            Nobody wants to be the 40-year-old whose skills stopped mattering. Here is what actually lasts.
+          </p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="rounded-xl p-5" style={{ background: '#f0faf8', border: '1px solid #00b89433' }}>
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#00b894' }}>
+                <ShieldCheck className="w-3.5 h-3.5" /> Durable — invest here
+              </div>
+              <div className="flex flex-col gap-2.5">
+                {futureProof.durable.map(d => (
+                  <div key={d.skill}>
+                    <div className="text-sm font-bold" style={{ color: '#2d3436' }}>{d.skill}</div>
+                    <div className="text-xs" style={{ color: '#4a5568' }}>{d.why}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="rounded-xl p-5" style={{ background: '#fffaf0', border: '1px solid #f39c1233' }}>
+              <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#f39c12' }}>
+                <AlertTriangle className="w-3.5 h-3.5" /> At risk — don&apos;t build a career on these
+              </div>
+              <div className="flex flex-col gap-2.5">
+                {futureProof.atRisk.map(d => (
+                  <div key={d.skill}>
+                    <div className="text-sm font-bold" style={{ color: '#2d3436' }}>{d.skill}</div>
+                    <div className="text-xs" style={{ color: '#4a5568' }}>{d.why}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Skills */}
