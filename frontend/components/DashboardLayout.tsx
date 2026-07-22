@@ -4,8 +4,8 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import {
   LayoutDashboard, Search, TrendingUp, BookOpen,
-  ScanLine, DollarSign, Calculator, User, Bell, LogOut,
-  Building2, ChevronRight, MessageSquare, MailOpen, Menu, X, Target, FileText, PawPrint,
+  ScanLine, DollarSign, Compass, User, Bell, LogOut,
+  Building2, ChevronRight, MessageSquare, Menu, X, Target, FileText, PawPrint,
   School, Landmark, Globe, ListChecks, BarChart3, ArrowLeft, Send
 } from 'lucide-react'
 
@@ -40,16 +40,15 @@ const candidateGroups: NavGroup[] = [
   {
     label: 'Career Tools',
     items: [
+      { href: '/course-advisor', icon: Compass, label: 'Course Advisor' },
       { href: '/career-path', icon: TrendingUp, label: 'Career Path' },
       { href: '/salary', icon: DollarSign, label: 'Salary Insights' },
-      { href: '/cost-calculator', icon: Calculator, label: 'Cost Calculator' },
     ],
   },
   {
     label: 'AI Coach',
     items: [
       { href: '/career-coach', icon: MessageSquare, label: 'AI Career Coach' },
-      { href: '/rejection-decoder', icon: MailOpen, label: 'Rejection Decoder' },
     ],
   },
   {

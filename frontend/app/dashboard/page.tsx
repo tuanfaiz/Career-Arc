@@ -8,7 +8,7 @@ import { defaultProfile, levelByKey, nextActionText } from '@/lib/careerData'
 import {
   computeCrs, riskOf, riskMeta, compatibility, CRS_LABELS, type CrsBreakdown, type Level,
 } from '@/lib/scoring'
-import { ArrowRight, Sparkles, FileText, Target, TrendingUp, DollarSign, Lightbulb } from 'lucide-react'
+import { ArrowRight, Sparkles, FileText, Target, TrendingUp, DollarSign, Lightbulb, Compass } from 'lucide-react'
 
 interface Profile {
   name: string; level: Level; programme: string; university: string
@@ -102,6 +102,18 @@ export default function DashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Course Advisor entry — for anyone still deciding what to study */}
+        <Link href="/course-advisor" className="card-hover rounded-2xl p-5 flex items-center gap-4 block" style={{ background: 'linear-gradient(135deg, #f0f2f5 0%, #eef7f4 100%)', boxShadow: '8px 8px 16px #babecc, -8px -8px 16px #ffffff', border: '1px solid #00b89433' }}>
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: '#00b894', boxShadow: '4px 4px 10px rgba(0,184,148,0.3)' }}>
+            <Compass className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="font-bold text-sm" style={{ color: '#2d3436' }}>Still deciding what to study?</div>
+            <div className="text-xs mt-0.5" style={{ color: '#4a5568' }}>Course Advisor matches you to courses — and shows routes that don&apos;t need a degree.</div>
+          </div>
+          <ArrowRight className="w-4 h-4 flex-shrink-0" style={{ color: '#00b894' }} />
+        </Link>
 
         {/* Outcome stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'sw
 const jetbrainsMono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Career Arc — Navigate Your 40-Year Career Journey',
+  title: 'Career Arc — Career Clarity for Gen Z Malaysia',
   description: 'AI-powered career platform for Malaysian professionals. ATS scanner, career path simulator, salary insights, and more.',
 }
 

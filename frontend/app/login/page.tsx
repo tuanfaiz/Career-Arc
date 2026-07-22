@@ -76,7 +76,7 @@ export default function LoginPage() {
             <h1 className="text-2xl font-black uppercase tracking-widest" style={{ color: '#2d3436' }}>
               CAREER <span style={{ color: '#ff4757' }}>ARC</span>
             </h1>
-            <p className="text-sm mt-1" style={{ color: '#4a5568' }}>Navigate your 40-year career journey</p>
+            <p className="text-sm mt-1" style={{ color: '#4a5568' }}>Career clarity for Gen Z Malaysia</p>
           </div>
 
           {/* One-click demo access (for judges) */}

@@ -4,7 +4,7 @@ import DashboardLayout from '@/components/DashboardLayout'
 import StatCard from '@/components/StatCard'
 import { mockUniversityStats as s } from '@/lib/mockData'
 import { cohort, universityInsight } from '@/lib/careerData'
-import { Users, TrendingUp, AlertTriangle, GraduationCap, Building2, Target, BarChart3, Sparkles, ListChecks } from 'lucide-react'
+import { Users, TrendingUp, AlertTriangle, GraduationCap, Building2, Target, BarChart3, Sparkles, ListChecks, Anchor } from 'lucide-react'
 
 export default function UniversityPage() {
   return (
@@ -28,7 +28,7 @@ export default function UniversityPage() {
           <StatCard label="Cohort Readiness" value={`${cohort.avgCrs}`} icon={<TrendingUp size={18} />} accent subtitle="Avg Career Readiness Score" />
           <StatCard label="Students at Risk" value={`${cohort.atRisk}`} icon={<AlertTriangle size={18} />} subtitle={`+${cohort.mediumRisk} medium risk`} />
           <StatCard label="Avg ATS Score" value={`${cohort.avgAts}`} icon={<Target size={18} />} />
-          <StatCard label="Portfolio Completion" value={`${cohort.portfolioCompletion}%`} icon={<Users size={18} />} />
+          <StatCard label="Still in 1st Job @12mo" value={`${s.retention12mo}%`} icon={<Anchor size={18} />} subtitle="Did the placement hold?" />
         </div>
 
         {/* AI insight + recommended action */}
