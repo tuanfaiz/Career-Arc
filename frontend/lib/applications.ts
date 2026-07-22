@@ -4,6 +4,8 @@ export interface MyApplication {
   jobId: string
   appliedDate: string
   status: 'Submitted'
+  /** Whether the candidate attached their 60-second Story Video. */
+  withVideo?: boolean
 }
 
 const KEY = 'myApplications'
@@ -17,10 +19,10 @@ export function hasApplied(jobId: string): boolean {
   return readMyApplications().some(a => a.jobId === jobId)
 }
 
-export function addApplication(jobId: string): void {
+export function addApplication(jobId: string, withVideo = false): void {
   const apps = readMyApplications()
   if (apps.some(a => a.jobId === jobId)) return
   const appliedDate = new Date().toLocaleDateString('en-MY', { day: 'numeric', month: 'short', year: 'numeric' })
-  apps.push({ jobId, appliedDate, status: 'Submitted' })
+  apps.push({ jobId, appliedDate, status: 'Submitted', withVideo })
   localStorage.setItem(KEY, JSON.stringify(apps))
 }

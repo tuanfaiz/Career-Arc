@@ -6,7 +6,7 @@ import {
   LayoutDashboard, Search, TrendingUp, BookOpen,
   ScanLine, DollarSign, Compass, User, Bell, LogOut,
   Building2, ChevronRight, MessageSquare, Menu, X, Target, FileText, PawPrint,
-  School, Landmark, Globe, ListChecks, BarChart3, ArrowLeft, Send
+  School, Landmark, Globe, ListChecks, BarChart3, ArrowLeft, Send, Video
 } from 'lucide-react'
 
 type NavItem = { href: string; icon: React.ElementType; label: string }
@@ -26,6 +26,7 @@ const candidateGroups: NavGroup[] = [
       { href: '/resume-builder', icon: FileText, label: 'Resume Builder' },
       { href: '/portfolio', icon: BookOpen, label: 'Portfolio' },
       { href: '/aptitude-test', icon: PawPrint, label: 'YourAnimal Test' },
+      { href: '/story-video', icon: Video, label: 'My Story Video' },
     ],
   },
   {
