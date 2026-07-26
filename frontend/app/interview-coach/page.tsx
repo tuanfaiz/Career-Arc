@@ -1,82 +1,11 @@
 'use client'
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { heuristicFeedback, verdictMeta, type SifuFeedback } from '@/lib/sifu'
+import { heuristicFeedback, verdictMeta, questionBank, type SifuFeedback, type QType, type InterviewQuestion } from '@/lib/sifu'
 import {
   MessageSquare, ChevronRight, Eye, EyeOff, RefreshCw, Clock, CheckCircle,
   Sparkles, Send, ThumbsUp, ThumbsDown, Check, X,
 } from 'lucide-react'
-
-type QType = 'Technical' | 'Behavioral' | 'Situational'
-
-const questionBank: Record<QType, { q: string; answer: string }[]> = {
-  Technical: [
-    {
-      q: 'Explain the difference between `==` and `===` in JavaScript. When would you use one over the other?',
-      answer: '`===` checks both value AND type (strict equality) — always prefer this. `==` does type coercion before comparing (e.g., `0 == false` is true), which causes subtle bugs. Only use `==` when you intentionally want to allow type coercion, such as checking for both `null` and `undefined` at once (`value == null`).'
-    },
-    {
-      q: 'What is the React virtual DOM and how does it improve performance?',
-      answer: 'The virtual DOM is a lightweight in-memory copy of the real DOM. When state changes, React re-renders the virtual DOM, diffs it against the previous version (reconciliation), then applies only the minimal set of real DOM updates needed. This batching avoids expensive full-page repaints.'
-    },
-    {
-      q: 'Walk me through how you would optimize a slow-loading React application.',
-      answer: '1) Profile with React DevTools to find re-renders. 2) Memoize heavy components with React.memo / useMemo / useCallback. 3) Code-split with dynamic imports. 4) Virtualize long lists (react-window). 5) Optimize images (WebP, lazy loading). 6) Move heavy logic out of the render cycle.'
-    },
-    {
-      q: 'Explain RESTful API design principles. What is the difference between PUT and PATCH?',
-      answer: 'REST uses stateless HTTP, resource-based URLs, and standard verbs. PUT replaces the entire resource (idempotent, sends full payload). PATCH updates only specified fields (partial update). Use PATCH when only a few fields change to save bandwidth and avoid accidentally nulling unset fields.'
-    },
-    {
-      q: 'What is database normalization and when would you intentionally denormalize?',
-      answer: 'Normalization removes data redundancy (1NF→3NF) to ensure consistency and reduce update anomalies. Denormalize when read performance is critical and data rarely changes — for example, storing a pre-computed order total avoids expensive JOINs on every dashboard load. Always benchmark before denormalizing.'
-    },
-  ],
-  Behavioral: [
-    {
-      q: 'Tell me about a time you had to meet a very tight deadline. How did you handle it?',
-      answer: 'Use STAR: Situation (sprint with half team on leave) → Task (deliver feature in 3 days) → Action (cut scope to MVP, daily standups with stakeholder, worked focused hours) → Result (shipped on time, stakeholder approved). Emphasize communication and prioritisation — not just "I worked overtime".'
-    },
-    {
-      q: 'Describe a situation where you disagreed with a teammate\'s technical decision. What did you do?',
-      answer: 'Show maturity: you raised the concern privately first (not in public Slack), backed it with data or a proof-of-concept, listened to their reasoning, and ultimately deferred or found a compromise. Interviewers want collaborative disagreement, not avoidance or aggression.'
-    },
-    {
-      q: 'Share a project you\'re most proud of and your specific contribution.',
-      answer: 'Pick something with measurable impact. Structure: what it was → why it mattered → YOUR specific role (avoid "we did everything") → what you learned. End with the outcome: "Reduced load time by 40%, which improved user retention by 15%." Numbers make it memorable.'
-    },
-    {
-      q: 'Tell me about a time you received critical feedback. How did you respond?',
-      answer: 'Don\'t say "I can\'t think of any." Show self-awareness: you received feedback (code review, performance review), you felt defensive initially (honest), you reflected and recognised the validity, you took concrete action to improve. Prove growth with a follow-up result.'
-    },
-    {
-      q: 'Describe a time you had to learn a new technology quickly under pressure.',
-      answer: 'Frame it as resourcefulness: you identified the fastest path to competence (official docs, not YouTube), built a minimal spike/POC first, asked targeted questions to teammates instead of spending hours guessing, and delivered. Show you can learn independently without hand-holding.'
-    },
-  ],
-  Situational: [
-    {
-      q: 'Your production server goes down at 2 AM and you\'re on-call. Walk me through your exact response.',
-      answer: '1) Acknowledge the alert immediately (SLA clock starts). 2) Check monitoring — is it infra, code, or data issue? 3) Roll back last deployment if recent. 4) Escalate to team if >15 min unresolved. 5) Communicate status to stakeholders proactively. 6) Post-incident write a blameless post-mortem. Calmness and process matter most here.'
-    },
-    {
-      q: 'A client requests a feature you know will create serious technical debt. What do you do?',
-      answer: 'Don\'t just say no or silently comply. Quantify the debt ("this will add ~2 weeks of refactoring later"), propose a slightly longer but clean alternative, and let the client decide with full information. If they still insist, document the trade-off and set a "debt payment" sprint for Q+1.'
-    },
-    {
-      q: 'Two days from a critical deadline, you discover a core feature is fundamentally broken. What do you do?',
-      answer: 'Immediately surface it — never hide it hoping it fixes itself. Assess: can it be descoped for this release? Can a workaround ship? Communicate to PM with options and time estimates, not just "we have a problem." Propose a fallback (feature flag, limited rollout) so the launch isn\'t fully blocked.'
-    },
-    {
-      q: 'You\'re asked to review a junior developer\'s PR and it has fundamental architectural problems. How do you give feedback?',
-      answer: 'Assume positive intent. Start with what\'s good (1-2 genuine things). Explain the WHY behind each concern — don\'t just say "this is wrong," show the failure scenario. Offer a concrete suggestion. Invite discussion, don\'t mandate. The goal is the junior learning, not proving you\'re smarter.'
-    },
-    {
-      q: 'Your team cannot agree on which framework to use for a new project and you\'re losing days. How do you move forward?',
-      answer: 'Timeboxed spike: each advocate builds the same small feature in their preferred stack in 2 hours, then demos it. Evaluate on: team familiarity, hiring pool, performance, ecosystem. Then the tech lead makes a decision and documents it. Disagree-and-commit beats endless debate.'
-    },
-  ],
-}
 
 const roles = ['Frontend Engineer', 'Backend Engineer', 'Data Analyst', 'Product Manager', 'UX Designer', 'DevOps Engineer', 'Full Stack Engineer']
 const companies = ['Startup (Agile)', 'MNC (Structured)', 'GLC (Government-linked)', 'Consulting Firm']
@@ -129,7 +58,8 @@ export default function CareerCoachPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState(difficulties[1])
   const [questionType, setQuestionType] = useState<QType>('Technical')
   const [loading, setLoading] = useState(false)
-  const [questions, setQuestions] = useState<typeof questionBank.Technical | null>(null)
+  const [questions, setQuestions] = useState<InterviewQuestion[] | null>(null)
+  const [questionSource, setQuestionSource] = useState<'ai' | 'simulated' | null>(null)
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set())
   const [checked, setChecked] = useState<Set<number>>(new Set())
   const [answers, setAnswers] = useState<Record<number, string>>({})
@@ -143,9 +73,22 @@ export default function CareerCoachPage() {
     setAnswers({})
     setFeedback({})
     setEvaluating({})
-    await new Promise(r => setTimeout(r, 1600))
-    setQuestions(questionBank[questionType])
-    setLoading(false)
+    try {
+      const res = await fetch('/api/interview-questions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: selectedRole, company: selectedCompany, level: selectedDifficulty, questionType, count: 5 }),
+      })
+      if (!res.ok) throw new Error('bad response')
+      const data = (await res.json()) as { questions: InterviewQuestion[]; source: 'ai' | 'simulated' }
+      setQuestions(data.questions?.length ? data.questions : questionBank[questionType])
+      setQuestionSource(data.questions?.length ? data.source : 'simulated')
+    } catch {
+      setQuestions(questionBank[questionType])
+      setQuestionSource('simulated')
+    } finally {
+      setLoading(false)
+    }
   }
 
   async function evaluate(i: number, question: string) {
@@ -256,9 +199,14 @@ export default function CareerCoachPage() {
         {/* Questions */}
         {questions && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between px-1">
-              <h3 className="font-bold text-sm uppercase tracking-widest" style={{ color: '#2d3436' }}>
+            <div className="flex items-center justify-between px-1 flex-wrap gap-2">
+              <h3 className="font-bold text-sm uppercase tracking-widest flex items-center gap-2" style={{ color: '#2d3436' }}>
                 {questionType} Questions — {selectedRole}
+                {questionSource && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded normal-case tracking-normal" style={{ background: questionSource === 'ai' ? '#6c5ce718' : '#4a556818', color: questionSource === 'ai' ? '#6c5ce7' : '#7a8699' }}>
+                    {questionSource === 'ai' ? '✨ AI-generated' : 'Sample set'}
+                  </span>
+                )}
               </h3>
               <span className="text-xs font-mono" style={{ color: '#4a5568' }}>{checked.size}/{questions.length} practiced</span>
             </div>

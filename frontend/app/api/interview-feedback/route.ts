@@ -55,11 +55,11 @@ export async function POST(req: NextRequest) {
   try {
     const client = new Anthropic({ apiKey })
     const message = await client.messages.create({
-      model: 'claude-opus-4-8',
+      model: 'claude-haiku-4-5',
       max_tokens: 1024,
       system: SYSTEM,
-      // effort:low keeps it fast for a live demo; format guarantees valid JSON.
-      output_config: { effort: 'low', format: { type: 'json_schema', schema } },
+      // Haiku 4.5 rejects the `effort` param — use format only (guarantees valid JSON).
+      output_config: { format: { type: 'json_schema', schema } },
       messages: [{
         role: 'user',
         content:
