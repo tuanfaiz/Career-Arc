@@ -57,7 +57,7 @@ export default function CourseAdvisorPage() {
             <div>
               <h2 className="text-xl sm:text-2xl font-black" style={{ color: '#2d3436' }}>What should I study?</h2>
               <p className="text-sm mt-1" style={{ color: '#4a5568' }}>
-                Still in school? Answer 3 quick questions before you commit 4 years and RM40,000 to a course.
+                Still in school? Answer 3 quick questions before you commit four years — and a PTPTN loan — to a course.
               </p>
             </div>
           </div>
