@@ -1,91 +1,110 @@
-# Career Arc — Concept Brief
-### Talentbank Career OS Hackathon · Stage 1 Submission
+# CareerArc — Project Summary
+### Talentbank Tech Hackathon 2026 · Team: Hani & Faiz
+**Live prototype:** https://career-arc-phi.vercel.app
 
 ---
 
-## The Problem
+## One line
 
-Malaysian fresh graduates and mid-career professionals face a job market that is simultaneously competitive and opaque. A Computer Science graduate from UPM sends out 80 applications over three months. They get 12 interviews. They receive 11 rejections — most worded identically: *"We will keep your resume on file."* One offer lands below their rent.
-
-This is not a skills crisis. It is an information crisis.
-
-Candidates do not know what an ATS system sees when it reads their CV. They do not know whether RM 6,500 is above or below market for their role in Cyberjaya. They do not know if a job in KLCC with a RM 1,500 higher salary actually pays less after accounting for toll, parking, and an hour of commute each way. They do not know which companies are notorious for ghosting after a final-round interview. And crucially — most candidates do not know themselves well enough to know which type of role or environment they will actually thrive in.
-
-On the employer side, Malaysian hiring managers deal with an equally broken system. They receive 63 applications for one Data Analyst role. They cannot efficiently surface the strongest candidates. Their response time slips. They ghost candidates unintentionally — and their employer brand takes the hit.
-
-Career Arc was built to fix both sides of this equation.
+**CareerArc is Malaysia's Career Operating System** — one platform that helps Gen Z choose the right path, helps employers hire accountably, and helps universities intervene *before* students graduate unprepared.
 
 ---
 
-## The Solution
+## The problem
 
-**Career Arc** is a career intelligence platform that gives candidates the tools to navigate a 40-year career with clarity, and gives employers the accountability metrics to hire with integrity.
+Malaysia's early-career market is competitive but **opaque**, and it fails three groups at once.
 
-The guiding philosophy is simple: every decision in a career is a data problem. Where should I work? What should I earn? Is this job offer actually better than my current one? How do I perform under interview pressure? What kind of professional am I, really? Career Arc turns these guesses into answers.
+A graduate sends 80 applications and gets ghosted. They do not know what an ATS sees in their CV, whether RM 6,500 is fair for their role, or which employers go silent after a final round. Long before that, at seventeen, they chose a course with almost no information about where it actually leads.
 
-The platform is built around two account types — Candidate and Employer — each with a dedicated dashboard and toolset.
+An employer receives 63 applications for one Data Analyst role, cannot efficiently surface the strongest candidates, and unintentionally ghosts the rest — damaging their own brand.
 
----
+A university discovers its graduates were unemployable **after** they graduated, when nothing can be done.
 
-## Feature Modules
-
-### Module 01 — Career Path Navigator
-A 40-year career simulation tool. Candidates see three branching trajectories from their current role: the technical track (Senior Engineer → CTO), the management track (Team Lead → Director), and the entrepreneurship track (Tech Lead → Founder). Each path shows projected salary milestones, required skill progression, and the specific gap between where they are now and where each path leads. This is not generic advice — it is a personalised arc.
-
-### Module 02 — Living Portfolio
-A portfolio builder that goes beyond a static PDF. Candidates log their projects, contributions, and achievements in a timeline view. An AI Polish toggle rewrites raw bullet points into polished professional descriptions — turning "built login page" into "Engineered secure authentication system with session management, reducing login-related support tickets by 40%." The portfolio is always live, always updatable, and always ready to share.
-
-### Module 03 — ATS Resume Scanner
-Before a human reads a resume, an Applicant Tracking System does. Most candidates do not know this. The ATS Scanner analyses resume structure, keyword density, and section formatting against what ATS systems look for. It returns a score, a section-by-section breakdown, a matched and missing keyword analysis, and a prioritised fix-it checklist. Candidates can also paste a specific job description to see their match percentage for that role.
-
-### Module 04 — Fair Pay Engine
-Malaysian salary data is fragmented and often outdated. The Fair Pay Engine surfaces benchmarks for specific roles, seniority levels, and cities — showing 25th percentile, median, and 75th percentile ranges. Candidates see exactly where their current salary sits on that spectrum. A built-in Negotiation Script Generator drafts a personalised email they can send to a hiring manager, grounded in real market data rather than guesswork.
-
-### Module 05 — Cost of Living Calculator
-A RM 8,500 job in KLCC versus a RM 7,000 job in Cyberjaya. Most candidates pick the higher number. Career Arc calculates the real take-home after rent, toll, petrol, food, and daily commute costs — and shows the annual difference. In many cases, the "lower salary" job puts significantly more money in your pocket. This module makes that comparison instant and visual.
-
-### Wildcard — Anti-Ghosting Employer Tracker
-Every job listing on Career Arc carries an Anti-Ghost rating: 🟢 Active (responds within 3 days), 🟡 Passive (responds but slowly), 🔴 Risk (known for going silent after interviews). The employer dashboard tracks average response time over the last six weeks and shows employers their Anti-Ghost score. An A+ rating attracts better candidates. The system creates accountability on both sides of the hiring process.
-
-### Resume Builder
-A live, two-panel resume editor purpose-built for ATS compatibility. Candidates fill in Contact, Summary, Experience, Education, and Skills sections on the left — and see a clean, ATS-safe A4 preview update in real time on the right. A live ATS Score gauge (0–100) rises as sections are completed, giving candidates a clear signal of readiness before they apply anywhere.
-
-### Career Aptitude Test
-A 10-question personality assessment that surfaces which of five career archetypes a candidate most resembles: the Architect (analytical, systems-focused), the Connector (people-first, collaborative), the Builder (execution-driven, high-output), the Visionary (creative, big-picture), or the Guardian (detail-oriented, process-driven). Each result includes a full work-style description and a list of roles the candidate is naturally suited for. The result is stored on the candidate's profile — and displayed as a personality badge on employer dashboards, giving hiring managers an instant signal of culture and team fit without reading between the lines of a CV.
-
-### AI Career Coach
-Mock interview practice, tailored by role, seniority, company type, and question category — Technical, Behavioural, or Situational. Each session generates five targeted questions with a two-minute practice timer and a model answer toggle. Candidates can mark questions as practised and generate new sets until they feel genuinely ready, not just familiar.
-
-### Rejection Letter Decoder
-Corporate HR language is designed to be legally safe, not honest. The Rejection Decoder translates rejection emails into actionable intelligence: what the company actually meant, which phrases are standard filler, where the candidate likely lost points, and a concrete plan for what to do next — including the earliest sensible date to reapply. The module closes with a coaching note, because job searching is mentally exhausting and candidates deserve honesty alongside strategy.
+This is not primarily a skills crisis. It is an **information crisis** — and today's system measures the wrong thing. Everyone measures *how fast* a graduate gets hired. **Nobody measures whether they chose well, or whether they stayed.**
 
 ---
 
-## Technical Architecture
+## The solution: one score, three lenses
 
-Career Arc is structured as a monorepo with a deliberate separation between frontend and backend, ready for Stage 2 integration:
+CareerArc connects all three groups through a single source of truth — the **Career Readiness Score (CRS)** — built from five weighted signals:
 
-- **Frontend**: Next.js 14 (App Router) with TypeScript and Tailwind CSS
-- **Design System**: Industrial Skeuomorphism — neumorphic cards, tactile button states, and a chassis-grey palette (`#e0e5ec`) with red accent (`#ff4757`). The UI is built to feel like a precision instrument, not a generic SaaS dashboard
-- **Authentication**: Role-based login (Candidate / Employer) routing to separate dashboards with localStorage session management for the prototype stage
-- **Navigation**: Grouped sidebar with five logical sections — Home, My Profile, Find Jobs, Career Tools, and AI Coach — with a mobile-responsive drawer
-- **Data**: All features are powered by structured mock data for Stage 1. Stage 2 will introduce a real backend with AI inference endpoints, live salary data, and employer analytics
-- **Deployment**: Vercel, with the Next.js app in the `/frontend` subdirectory
+```
+CRS = Resume·25% + ATS·25% + Skill Match·25% + Portfolio·15% + Application Activity·10%
+       0–49 High Risk   ·   50–69 Medium   ·   70–100 Low Risk
+```
 
----
+The same student's score is read three different ways:
 
-## Why Career Arc
+| Who | What the score means to them |
+|---|---|
+| **Candidate** | *"How ready am I, and what do I fix next?"* |
+| **Employer** | A hiring signal — readiness, then fit for the specific role |
+| **University** | A risk flag that triggers help **while there is still time** |
 
-Most job platforms help you apply. Career Arc helps you understand yourself, prepare for what is ahead, evaluate your options clearly, and recover when things do not go to plan.
-
-It treats candidates as intelligent adults who deserve real information — not just a Submit Application button. It treats employers as accountable partners in the hiring process, not just customers buying access to a CV pile.
-
-The 40-year framing is intentional. A career is not a series of job applications. It is the most consequential long-term project most people will ever manage. Career Arc is the platform that treats it that way.
+**One number. Three points of view.** That is what makes CareerArc a connected operating system rather than a collection of separate tools.
 
 ---
 
-## Team
+## What we built
 
-**Hani** · **Faiz**
+### For candidates — decide, prepare, apply
 
-Built for the Talentbank Career OS Hackathon · June 2026
+- **Course Advisor** — for 16–18 year olds who have not chosen yet. Three questions (interests, subjects, work style) return three matched courses with demand signals, an honest *"will this still matter in 10 years?"* note, and a **non-degree route** for each — because a large share of Gen Alpha do not intend to go to university.
+- **Guided onboarding** — a level-tailored wizard (Internship / Fresh Grad / Mid / Senior) where the readiness score visibly climbs as the profile fills in.
+- **Readiness dashboard** — the CRS with its five-part breakdown and an AI-written *next best action* targeting the weakest component.
+- **Next 4 Years** — a concrete year-by-year plan of what to *do*, plus clearly-labelled 2030 and 2040 **scenarios** (not forecasts) and a future-proof check of durable vs automatable skills.
+- **Job matching** — a **6-factor Match Score** (skills 35%, experience 25%, role similarity 15%, tools 10%, education 10%, industry 5%) that explains *why* a candidate fits, names the missing skills, and gives an apply/don't-apply verdict.
+- **SIFU Interview Coach** — *Smart Interview Feedback & Upskilling.* **Powered by real AI**: it generates tailored interview questions and scores the answer you actually type, with STAR analysis and specific fixes.
+- **My Story Video** — a guided 60-second video answering four prompts, so a candidate is more than a score.
+- **Anti-Ghosting ratings** and **verified company profiles** so candidates can judge an employer before applying.
+
+### For employers — hire with accountability
+
+Applicants ranked by readiness and YourAnimal culture fit; a **"Match to this role"** breakdown ending in *gaps to probe in interview*; the candidate's Story Video and resume in one view; and the employer's own **Anti-Ghost score** — average response time and ghosting rate — framed as a recruiting advantage.
+
+### For universities — intervene before graduation
+
+A cohort employability dashboard, a **Student Intervention Queue** naming exactly who is at risk, why, and what help to give (resume clinic, portfolio workshop, skill bootcamp), each with a *"Why this recommendation?"* explanation — plus a **Faculty Skill-Gap dashboard** showing which skills to close and how many students each gap blocks.
+
+### For the ministry — measure fit, not just speed
+
+A national employability view whose centrepiece is **"Speed vs Stickiness"**: today MOHE tracks how long graduates take to land a first job, but not **how long they stay**. Our dashboard shows both, flagging fields that hire fast yet lose people — a fit problem hidden behind a good speed number.
+
+> *"Time-to-hire measures speed. Retention measures fit. A graduate hired in 2 months who quits in 5 is counted as a success today."*
+
+---
+
+## Impact and sustainability
+
+CareerArc is built around impact rather than feature count, and maps to three UN Sustainable Development Goals:
+
+- **SDG 4 — Quality Education:** tracer-study and readiness data let universities close real skill gaps and align curricula with hiring demand.
+- **SDG 8 — Decent Work:** fair-pay benchmarks and anti-ghosting accountability raise the transparency and dignity of early-career hiring.
+- **SDG 17 — Partnerships:** one transparent platform connecting candidates, employers, universities and the ministry around shared outcomes.
+
+The measurable thesis is **early intervention** — catching at-risk students before graduation instead of counting unemployment afterwards.
+
+---
+
+## Technical approach
+
+Next.js 16 (App Router) with TypeScript and Tailwind CSS, deployed on Vercel as a public one-click prototype. All records are **simulated dummy data**, exactly as the brief requires — no real data, no PDPA exposure.
+
+The scoring engines are **real working code**, not mock-ups: readiness, job match and course match are deterministic, explainable functions.
+
+**One deliberate exception:** **SIFU calls the real Anthropic Claude API**, because the brief notes genuine AI integration is a bonus. It is the one module where a judge can type anything and receive a response that was not written in advance. The API key is server-side only and never reaches the browser; if the API is ever unavailable, SIFU falls back automatically and labels itself *"Simulated"* so the demo cannot break.
+
+---
+
+## Why CareerArc
+
+Most job platforms help you **apply**. CareerArc helps you **choose** — and then proves whether the choice held.
+
+It starts earlier than a job board (at course selection, age 16) and measures longer than a placement statistic (did they stay in the job?). It treats candidates as people who deserve real information, employers as accountable partners rather than customers buying a CV pile, and universities as institutions that should know their students are struggling **while they can still help**.
+
+**The demo in one sentence:** follow a single student's readiness score as it travels from their own dashboard, to an employer's shortlist, to their university's intervention queue.
+
+---
+
+**Team:** Hani · Faiz
+**Built for the Talentbank Tech Hackathon 2026**
