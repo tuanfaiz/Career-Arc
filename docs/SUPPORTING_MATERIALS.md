@@ -65,6 +65,16 @@ Implemented once in `lib/scoring.ts` (`computeCrs()`, `riskOf()`) and consumed b
 
 ---
 
+## How to read this section
+
+Each module below lists a **Data source** and an **API**. To avoid any confusion:
+
+- **File paths such as `lib/courseAdvisor.ts` are files inside our own codebase** — they are *not* external websites, third-party services or purchased datasets. Think of them as spreadsheets we wrote ourselves and shipped inside the app.
+- **"API: None"** means that module makes **no internet call at all**. Everything it needs is already bundled in the application.
+- **Exactly one module calls an external API** — SIFU (module 12), which calls the Anthropic Claude API. Every other module is fully self-contained, exactly as the brief requires: *"use dummy / simulated data… no API keys."*
+
+---
+
 ## CANDIDATE MODULES
 
 ### 1. One-Click Login · `/login`
