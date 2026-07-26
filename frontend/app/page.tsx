@@ -1,6 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-import { User, ScanLine, Shield, TrendingUp, BookOpen, Compass, Target, ArrowRight, ChevronRight } from 'lucide-react'
+import { MessageSquare, ScanLine, Shield, TrendingUp, BookOpen, Compass, Target, ArrowRight, ChevronRight } from 'lucide-react'
 
 export default function LandingPage() {
   return (
@@ -13,7 +13,7 @@ export default function LandingPage() {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6 text-xs uppercase tracking-widest font-medium"
             style={{ background: '#f0f2f5', boxShadow: '4px 4px 8px #babecc, -4px -4px 8px #ffffff', color: '#ff4757' }}>
             <Target size={12} />
-            Talentbank Career OS Hackathon 2025
+            Talentbank Career OS Hackathon 2026
           </div>
           <h1 className="text-5xl lg:text-6xl font-black tracking-tight leading-none mb-6" style={{ color: '#2d3436' }}>
             Career Clarity<br />
@@ -45,7 +45,7 @@ export default function LandingPage() {
               ))}
             </div>
             <span className="text-sm" style={{ color: '#4a5568' }}>
-              Trusted by <strong style={{ color: '#2d3436' }}>12,847+</strong> Malaysian professionals
+              Built for Malaysia&apos;s <strong style={{ color: '#2d3436' }}>300,000+</strong> fresh graduates every year
             </span>
           </div>
         </div>
@@ -59,18 +59,15 @@ export default function LandingPage() {
                 style={{ background: 'radial-gradient(circle at 35% 35%, #4a5568, #2d3436)', border: '1px solid #3d4446' }} />
             ))}
             <div className="text-center mb-4">
-              <span className="text-xs uppercase tracking-widest font-mono" style={{ color: '#fdcb6e' }}>CAREER ARC — 40-YR SIMULATOR</span>
+              <span className="text-xs uppercase tracking-widest font-mono" style={{ color: '#fdcb6e' }}>CAREER ARC — NEXT 4 YEARS</span>
             </div>
             <div className="rounded-xl p-5" style={{ background: '#1a1e22', border: '1px solid #3d4446' }}>
               <div className="flex items-end gap-2 h-32 mb-3">
                 {[
-                  { year: 'Y0', h: 18, s: '3.5k', c: '#6c5ce7' },
-                  { year: 'Y2', h: 30, s: '6k', c: '#6c5ce7' },
-                  { year: 'Y5', h: 45, s: '10k', c: '#ff4757' },
-                  { year: 'Y8', h: 60, s: '15k', c: '#ff4757' },
-                  { year: 'Y12', h: 70, s: '20k', c: '#ff4757' },
-                  { year: 'Y20', h: 85, s: '35k', c: '#00b09b' },
-                  { year: 'Y25', h: 100, s: '50k', c: '#00b09b' },
+                  { year: 'Y1', h: 32, s: '3.5k', c: '#6c5ce7' },
+                  { year: 'Y2', h: 55, s: '4.8k', c: '#ff4757' },
+                  { year: 'Y3', h: 78, s: '6k', c: '#ff4757' },
+                  { year: 'Y4', h: 100, s: '8k', c: '#00b09b' },
                 ].map((bar, i) => (
                   <div key={i} className="flex-1 flex flex-col items-center justify-end gap-1">
                     <span style={{ color: bar.c, fontSize: '9px' }} className="font-mono">{bar.s}</span>
@@ -90,7 +87,7 @@ export default function LandingPage() {
               </div>
             </div>
             <div className="flex gap-3 mt-4">
-              {[{ l: 'ATS Score', v: '78%', c: '#fdcb6e' }, { l: 'Match', v: '94%', c: '#00b09b' }, { l: 'Applied', v: '12', c: '#ff4757' }].map((s, i) => (
+              {[{ l: 'Readiness', v: '68', c: '#00b09b' }, { l: 'ATS Score', v: '78', c: '#fdcb6e' }, { l: 'Match', v: '87%', c: '#ff4757' }].map((s, i) => (
                 <div key={i} className="flex-1 rounded-lg px-3 py-2 text-center"
                   style={{ background: '#2d3436', border: '1px solid #3d4446' }}>
                   <div className="text-xs font-mono font-bold" style={{ color: s.c }}>{s.v}</div>
@@ -106,9 +103,9 @@ export default function LandingPage() {
       <section style={{ background: '#2d3436' }} className="py-12">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-3 gap-8">
           {[
-            { value: '12,847', label: 'Active Jobs', sub: 'across Malaysia', c: '#ff4757' },
-            { value: '94%', label: 'ATS Match Rate', sub: 'for our users', c: '#fdcb6e' },
-            { value: 'RM 8,200', label: 'Avg Salary Uplift', sub: 'after 12 months', c: '#00b09b' },
+            { value: '300K', label: 'Graduates a year', sub: "Malaysia's early-career market", c: '#ff4757' },
+            { value: '6', label: 'Match factors', sub: 'beyond a skills tick-list', c: '#fdcb6e' },
+            { value: '3', label: 'Views, one score', sub: 'candidate · employer · university', c: '#00b09b' },
           ].map((stat, i) => (
             <div key={i} className="text-center">
               <div className="text-4xl font-black font-mono mb-1" style={{ color: stat.c }}>{stat.value}</div>
@@ -129,7 +126,7 @@ export default function LandingPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: <User size={24} />, title: 'Smart Profile Builder', desc: 'AI-powered profile that highlights what Malaysian employers actually want', color: '#6c5ce7' },
+            { icon: <MessageSquare size={24} />, title: 'SIFU — AI Interview Coach', desc: 'Real AI generates questions and scores your answers — practice until you\'re ready.', color: '#6c5ce7' },
             { icon: <ScanLine size={24} />, title: 'ATS Resume Scanner', desc: 'Know your ATS score before you apply. Fix it before they ghost you.', color: '#ff4757' },
             { icon: <Shield size={24} />, title: 'Anti-Ghosting Tracker', desc: 'See employer response rates. Apply to companies that actually reply.', color: '#00b09b' },
             { icon: <TrendingUp size={24} />, title: 'Next 4 Years, Mapped', desc: 'A concrete year-by-year plan — plus honest scenarios for what comes after.', color: '#ff4757' },
@@ -156,7 +153,7 @@ export default function LandingPage() {
             Ready to Arc Your <span style={{ color: '#ff4757' }}>Career?</span>
           </h2>
           <p className="text-base mb-10" style={{ color: '#4a5568' }}>
-            Join thousands of Malaysian professionals who use Career Arc to navigate their career journey.
+            Built for Malaysia&apos;s Gen Z — from choosing a course to landing (and keeping) that first job.
           </p>
           <Link href="/login"
             className="inline-flex items-center gap-2 px-10 py-4 rounded-xl text-sm font-bold uppercase tracking-widest text-white btn-press transition-all"
@@ -174,7 +171,7 @@ export default function LandingPage() {
               <Target size={14} className="text-white" />
             </div>
             <span className="font-bold text-sm" style={{ color: '#f0f2f5' }}>CAREER <span style={{ color: '#ff4757' }}>ARC</span></span>
-            <span className="text-xs ml-4" style={{ color: '#4a5568' }}>© 2025 Career Arc. Talentbank Hackathon.</span>
+            <span className="text-xs ml-4" style={{ color: '#4a5568' }}>© 2026 Career Arc. Talentbank Hackathon.</span>
           </div>
           <div className="flex gap-8">
             {['Privacy', 'Terms', 'Contact'].map(link => (
