@@ -1,7 +1,11 @@
 'use client'
 import { useState } from 'react'
 import DashboardLayout from '@/components/DashboardLayout'
-import { MessageSquare, ChevronRight, Eye, EyeOff, RefreshCw, Clock, CheckCircle } from 'lucide-react'
+import { heuristicFeedback, verdictMeta, type SifuFeedback } from '@/lib/sifu'
+import {
+  MessageSquare, ChevronRight, Eye, EyeOff, RefreshCw, Clock, CheckCircle,
+  Sparkles, Send, ThumbsUp, ThumbsDown, Check, X,
+} from 'lucide-react'
 
 type QType = 'Technical' | 'Behavioral' | 'Situational'
 
@@ -128,14 +132,42 @@ export default function CareerCoachPage() {
   const [questions, setQuestions] = useState<typeof questionBank.Technical | null>(null)
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set())
   const [checked, setChecked] = useState<Set<number>>(new Set())
+  const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [feedback, setFeedback] = useState<Record<number, SifuFeedback>>({})
+  const [evaluating, setEvaluating] = useState<Record<number, boolean>>({})
 
   async function generateQuestions() {
     setLoading(true)
     setRevealedAnswers(new Set())
     setChecked(new Set())
+    setAnswers({})
+    setFeedback({})
+    setEvaluating({})
     await new Promise(r => setTimeout(r, 1600))
     setQuestions(questionBank[questionType])
     setLoading(false)
+  }
+
+  async function evaluate(i: number, question: string) {
+    const answer = (answers[i] ?? '').trim()
+    if (answer.length < 10) return
+    setEvaluating(prev => ({ ...prev, [i]: true }))
+    setFeedback(prev => { const n = { ...prev }; delete n[i]; return n })
+    try {
+      const res = await fetch('/api/interview-feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question, answer, role: selectedRole, level: selectedDifficulty, questionType }),
+      })
+      if (!res.ok) throw new Error('bad response')
+      const data = (await res.json()) as SifuFeedback
+      setFeedback(prev => ({ ...prev, [i]: data }))
+    } catch {
+      // Network/API failure — evaluate locally so the demo never dead-ends.
+      setFeedback(prev => ({ ...prev, [i]: { ...heuristicFeedback(answer, questionType), source: 'simulated' } }))
+    } finally {
+      setEvaluating(prev => ({ ...prev, [i]: false }))
+    }
   }
 
   function toggleAnswer(i: number) {
@@ -163,7 +195,7 @@ export default function CareerCoachPage() {
               <p className="text-sm mt-1" style={{ color: '#4a5568' }}>
                 <strong style={{ color: '#2d3436' }}>S</strong>mart <strong style={{ color: '#2d3436' }}>I</strong>nterview{' '}
                 <strong style={{ color: '#2d3436' }}>F</strong>eedback &amp; <strong style={{ color: '#2d3436' }}>U</strong>pskilling.
-                Practice real questions tailored to your role, company type and seniority — every one with a model answer.
+                Practice real questions, type your answer, and get <strong style={{ color: '#6c5ce7' }}>AI-scored feedback</strong> on what to fix.
               </p>
             </div>
           </div>
@@ -268,6 +300,82 @@ export default function CareerCoachPage() {
                           {item.answer}
                         </div>
                       )}
+
+                      {/* Your answer → real SIFU evaluation */}
+                      <div className="rounded-xl p-4" style={{ background: '#e0e5ec', boxShadow: 'inset 3px 3px 6px #babecc, inset -3px -3px 6px #ffffff' }}>
+                        <div className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#6c5ce7' }}>Your answer — get SIFU&apos;s feedback</div>
+                        <textarea
+                          value={answers[i] ?? ''}
+                          onChange={e => setAnswers(prev => ({ ...prev, [i]: e.target.value }))}
+                          placeholder="Type (or paste) how you'd answer this out loud…"
+                          rows={3}
+                          className="input-recessed w-full px-3.5 py-2.5 rounded-xl text-sm resize-y"
+                          style={{ color: '#2d3436' }}
+                        />
+                        <button onClick={() => evaluate(i, item.q)} disabled={evaluating[i] || (answers[i] ?? '').trim().length < 10}
+                          className="mt-3 w-full py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-white btn-press flex items-center justify-center gap-2"
+                          style={{ background: '#6c5ce7', boxShadow: '4px 4px 10px rgba(108,92,231,0.3)', opacity: (evaluating[i] || (answers[i] ?? '').trim().length < 10) ? 0.5 : 1 }}>
+                          {evaluating[i]
+                            ? <><RefreshCw className="w-4 h-4 animate-spin" /> SIFU is reviewing…</>
+                            : <><Sparkles className="w-4 h-4" /> Ask SIFU to evaluate</>}
+                        </button>
+                      </div>
+
+                      {/* Feedback */}
+                      {feedback[i] && (() => {
+                        const fb = feedback[i]
+                        const vm = verdictMeta[fb.verdict]
+                        return (
+                          <div className="rounded-xl p-5" style={{ background: vm.bg, boxShadow: '6px 6px 12px #babecc, -6px -6px 12px #ffffff', border: `1px solid ${vm.color}33` }}>
+                            <div className="flex items-center gap-3 mb-4 flex-wrap">
+                              <div className="w-14 h-14 rounded-full flex flex-col items-center justify-center flex-shrink-0" style={{ background: '#fff', boxShadow: `0 0 0 3px ${vm.color}` }}>
+                                <span className="text-lg font-black font-mono leading-none" style={{ color: vm.color }}>{fb.score}</span>
+                                <span className="text-[9px]" style={{ color: '#4a5568' }}>/100</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-1.5 mb-0.5">
+                                  <Sparkles className="w-3 h-3" style={{ color: vm.color }} />
+                                  <span className="text-xs font-bold uppercase tracking-widest" style={{ color: vm.color }}>SIFU · {vm.label}</span>
+                                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded" style={{ background: fb.source === 'ai' ? '#6c5ce718' : '#4a556818', color: fb.source === 'ai' ? '#6c5ce7' : '#7a8699' }}>
+                                    {fb.source === 'ai' ? '✨ Live AI' : 'Simulated'}
+                                  </span>
+                                </div>
+                                <p className="text-sm" style={{ color: '#2d3436' }}>{fb.summary}</p>
+                              </div>
+                            </div>
+
+                            {/* STAR coverage (behavioral / situational) */}
+                            {questionType !== 'Technical' && (
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                {(['situation', 'task', 'action', 'result'] as const).map(k => {
+                                  const on = fb.star[k]
+                                  return (
+                                    <span key={k} className="flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-bold capitalize"
+                                      style={{ background: on ? '#00b89418' : '#ff475712', color: on ? '#00b894' : '#ff4757' }}>
+                                      {on ? <Check className="w-3 h-3" /> : <X className="w-3 h-3" />}{k}
+                                    </span>
+                                  )
+                                })}
+                              </div>
+                            )}
+
+                            <div className="grid sm:grid-cols-2 gap-3">
+                              <div>
+                                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: '#00b894' }}><ThumbsUp className="w-3.5 h-3.5" /> Strengths</div>
+                                <ul className="space-y-1">
+                                  {fb.strengths.map((s, k) => <li key={k} className="text-xs flex items-start gap-1.5" style={{ color: '#2d3436' }}><Check className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: '#00b894' }} />{s}</li>)}
+                                </ul>
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest mb-1.5" style={{ color: '#f39c12' }}><ThumbsDown className="w-3.5 h-3.5" /> Improve</div>
+                                <ul className="space-y-1">
+                                  {fb.improvements.map((s, k) => <li key={k} className="text-xs flex items-start gap-1.5" style={{ color: '#2d3436' }}><ChevronRight className="w-3 h-3 mt-0.5 flex-shrink-0" style={{ color: '#f39c12' }} />{s}</li>)}
+                                </ul>
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })()}
                     </div>
                   </div>
                 </div>
@@ -297,8 +405,8 @@ export default function CareerCoachPage() {
               {[
                 { n: '01', t: 'Configure', d: 'Select your target role, company type, and seniority level.' },
                 { n: '02', t: 'Get Questions', d: 'AI generates 5 tailored questions based on your profile.' },
-                { n: '03', t: 'Practice Aloud', d: 'Use the 2-minute timer to simulate real interview conditions.' },
-                { n: '04', t: 'Check Answer', d: 'Compare your answer against our model answer to improve.' },
+                { n: '03', t: 'Answer It', d: 'Use the 2-minute timer, then type how you would respond.' },
+                { n: '04', t: 'Get AI Feedback', d: 'SIFU scores your answer, checks STAR, and tells you exactly what to fix.' },
               ].map(({ n, t, d }) => (
                 <div key={n} className="flex items-start gap-4 p-4 rounded-xl" style={{ background: '#e0e5ec', boxShadow: 'inset 2px 2px 4px #babecc, inset -2px -2px 4px #ffffff' }}>
                   <span className="font-mono font-black text-lg leading-none" style={{ color: '#6c5ce7' }}>{n}</span>
