@@ -65,6 +65,16 @@ Implemented once in `lib/scoring.ts` (`computeCrs()`, `riskOf()`) and consumed b
 
 ---
 
+## How to read this section
+
+Each module below lists a **Data source** and an **API**. To avoid any confusion:
+
+- **File paths such as `lib/courseAdvisor.ts` are files inside our own codebase** — they are *not* external websites, third-party services or purchased datasets. Think of them as spreadsheets we wrote ourselves and shipped inside the app.
+- **"API: None"** means that module makes **no internet call at all**. Everything it needs is already bundled in the application.
+- **Exactly one module calls an external API** — SIFU (module 12), which calls the Anthropic Claude API. Every other module is fully self-contained, exactly as the brief requires: *"use dummy / simulated data… no API keys."*
+
+---
+
 ## CANDIDATE MODULES
 
 ### 1. One-Click Login · `/login`
@@ -257,10 +267,98 @@ Per the hackathon brief — *"use dummy / simulated data… no real data, no PDP
 
 The Anthropic API key lives only in a Vercel environment variable and is read server-side inside the API route. It is never sent to the browser, never committed to the repository, and is not present in the client bundle.
 
-## What we would build next (Stage 2)
+---
 
-- Real database and authentication replacing localStorage
-- Live employer job feeds and verified partner onboarding
-- Real ATS resume parsing (currently simulated)
-- Video upload and storage for Story Video (currently in-browser only)
-- University data pipelines feeding real tracer-study reporting
+# PART 4 — REAL IMPLEMENTATION BLUEPRINT
+
+## Why this section exists
+
+The prototype runs on simulated data because the brief requires it. **This section sets out what would power each module in production**, so the concept can be judged as *buildable* rather than hypothetical.
+
+Nothing below is speculative technology. Every source named already exists in Malaysia today — the work is integration and partnership, not invention.
+
+## Production architecture
+
+| Layer | Production choice | Note |
+|---|---|---|
+| **Frontend** | Next.js (unchanged) | The prototype UI is already production-grade |
+| **Backend / API** | Next.js server routes → Node.js services | Already proven: our SIFU routes work this way |
+| **Database** | PostgreSQL (Supabase / AWS RDS) | Replaces `localStorage`; stores profiles, applications, scores |
+| **Authentication** | Auth0 / Clerk / Supabase Auth | Email + institutional SSO for university accounts |
+| **File & video storage** | AWS S3 + Mux or Cloudflare Stream | Resume PDFs and Story Videos |
+| **AI layer** | Anthropic Claude API | **Already live for SIFU** — extend to resume parsing and coaching |
+| **Analytics** | Scheduled jobs writing to a data warehouse | Powers the university and ministry dashboards |
+
+## Where the real data would come from
+
+### A. Talentbank's own assets — *available on day one*
+
+The strongest data advantage is Talentbank's, not a third party's:
+
+- **10,000+ employer network** → live job listings and verified employer profiles
+- **50 university partners** → cohort data for the university dashboards
+- **~50 career fairs a year** → employer engagement and placement outcomes
+- **YourWork Animal (yourworkanimal.com)** → the personality assessment is already Talentbank IP; we integrate rather than rebuild
+
+### B. Malaysian national and government sources
+
+| Source | What it powers |
+|---|---|
+| **MOHE Graduate Tracer Study** (*Kajian Pengesanan Graduan*) | University and ministry employability dashboards — the national survey already run annually |
+| **MQA — Malaysian Qualifications Register** | Course Advisor: every accredited programme in Malaysia |
+| **TalentCorp — Critical Occupations List / MyNext** | Which skills and roles are genuinely in demand |
+| **DOSM — Salaries & Wages Survey** | Fair-pay benchmarks by role, sector and state |
+| **MyFutureJobs (PERKESO)** | National vacancy data |
+| **SSM e-Info** (Companies Commission) | Verifying employers are real registered businesses |
+| **EPF (KWSP) / SOCSO contribution continuity** | **Retention** — see below |
+
+> **How we would actually measure "Speed vs Stickiness."** Retention is the metric nobody tracks today, and it is measurable: if a graduate's EPF or SOCSO contributions from one employer stop after five months, they left that job. Combined with 6- and 12-month follow-up surveys through the existing tracer-study channel, this produces a real national retention figure. This requires a government data-sharing agreement — which is precisely why it belongs to a Talentbank-scale platform rather than a startup.
+
+### C. Commercial APIs
+
+| Service | What it powers |
+|---|---|
+| **Textkernel / Sovren, Affinda or RChilli** | Real ATS resume parsing and scoring |
+| **JobStreet (SEEK) partner feed** | Supplementary job listings beyond Talentbank's own network |
+| **Anthropic Claude API** | SIFU coaching (**already live**), resume feedback, insight generation |
+| **Mux / Cloudflare Stream** | Story Video hosting and playback |
+
+### D. Platform-native data — *we generate it ourselves*
+
+Some of the most valuable data has no external source, because **nobody collects it today**. This is proprietary from day one:
+
+- **Anti-Ghost scores** — computed from real employer response timestamps inside the platform
+- **Career Readiness Scores** — the same formula, run on real resumes, real applications and verified portfolios
+- **Match Score outcomes** — which predicted matches actually converted to hires, used to tune the weightings
+
+## Module-by-module: prototype → production
+
+| Module | Today (prototype) | In production |
+|---|---|---|
+| **Job Search & Match** | `mockJobs` | Talentbank employer network + JobStreet partner feed + MyFutureJobs |
+| **Career Readiness Score** | Computed from seeded profiles | Same formula — real parsed resumes, real application activity |
+| **ATS Scanner** | Simulated score | Textkernel / Affinda parsing + Claude analysis |
+| **Course Advisor** | `lib/courseAdvisor.ts` | MQA Qualifications Register + MOHE tracer outcomes + TalentCorp demand data |
+| **Career Path** | `careerPathData` | Real career transitions aggregated from platform placements |
+| **Salary Insights** | `mockSalaryData` | DOSM Salaries & Wages Survey + platform placement salaries |
+| **YourAnimal Test** | `lib/animalTest.ts` | Integrate Talentbank's existing yourworkanimal.com system |
+| **Company profiles** | `mockCompanies` | SSM e-Info verification + Talentbank verified partner network |
+| **Company reviews** | Simulated | Reviews from candidates actually placed through the platform |
+| **Anti-Ghost score** | Seeded values | Platform-native — real employer response timestamps |
+| **SIFU Interview Coach** | ✅ **Already real** (Claude API) | Same, plus voice input and richer feedback |
+| **Story Video** | In-browser only | Mux / Cloudflare Stream upload and hosting |
+| **University dashboards** | Derived from seeded cohort | University SIS integration + MOHE Graduate Tracer Study |
+| **Ministry dashboard** | `mockMinistryStats` | MOHE / MyMOHES national statistics |
+| **Retention (Speed vs Stickiness)** | Seeded values | EPF / SOCSO contribution continuity + tracer follow-up surveys |
+
+## Realistic sequencing
+
+We are deliberately honest about what is easy and what needs partnership:
+
+| Tier | What | What it needs |
+|---|---|---|
+| **1 — Buildable immediately** | Database, auth, resume parsing, video hosting, expanded AI, platform-native scoring | Commercial contracts only. Weeks, not months. |
+| **2 — Needs Talentbank** | Live employer listings, verified companies, university cohort data, YourAnimal integration | Talentbank's existing network and university MOUs — assets they already hold |
+| **3 — Needs government partnership** | MOHE tracer study integration, national ministry reporting, EPF/SOCSO retention measurement | Data-sharing agreements with MOHE and PERKESO. Highest impact, longest timeline. |
+
+**The honest summary:** everything a candidate touches is Tier 1 or Tier 2 and could ship within months. The ministry-scale retention measurement is Tier 3 — the most valuable and the slowest, which is exactly why it belongs to an organisation with existing government relationships rather than to a startup building alone.
